@@ -59,6 +59,7 @@ export class RuddurClient {
           Authorization: `Bearer ${this.token}`,
           Accept: "application/json",
           ...(hasBody ? { "Content-Type": "application/json" } : {}),
+          ...(args.idempotencyKey ? { "Idempotency-Key": args.idempotencyKey } : {}),
           "User-Agent": "ruddur-mcp/0.1.0",
         },
         body: hasBody ? JSON.stringify(args.body) : undefined,

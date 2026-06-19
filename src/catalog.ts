@@ -8,7 +8,7 @@ const op = (
   method: Operation["method"],
   path: string,
   scope: Operation["scope"],
-  flags: Pick<Operation, "mutation" | "destructive" | "confirmationRequired"> = {},
+  flags: Pick<Operation, "mutation" | "destructive" | "confirmationRequired" | "idempotencyKeyRequired"> = {},
 ): Operation => ({ name, description, method, path, scope, ...flags });
 
 export const OPERATIONS: Operation[] = [
@@ -54,7 +54,7 @@ export const OPERATIONS: Operation[] = [
   op("ruddur_detach_media_asset", "Detach a media asset from Ruddur content.", "POST", "/api/creator/media/assets/:id/detach", one("media.manage"), { mutation: true, confirmationRequired: true }),
   op("ruddur_create_media_transform", "Create or register a media transform.", "POST", "/api/creator/media/assets/:id/transforms", one("media.manage"), { mutation: true }),
 
-  op("ruddur_record_creator_event", "Record a creator analytics event.", "POST", "/api/creator/analytics/events", one("events.write"), { mutation: true }),
+  op("ruddur_record_creator_event", "Record a creator analytics event.", "POST", "/api/creator/analytics/events", one("events.write"), { mutation: true, idempotencyKeyRequired: true }),
   op("ruddur_get_creator_analytics", "Get creator analytics summary.", "GET", "/api/creator/analytics/summary", one("analytics.read")),
   op("ruddur_get_creator_billing", "Get creator billing summary.", "GET", "/api/creator/billing", one("billing.read")),
 
@@ -124,6 +124,13 @@ export const toolForOperation = (operation: Operation) => {
       description: "Must be true after the user has explicitly confirmed this sensitive action.",
     };
   }
+  if (operation.idempotencyKeyRequired) {
+    properties.idempotencyKey = {
+      type: "string",
+      minLength: 1,
+      description: "Unique idempotency key for safely retrying this operation.",
+    };
+  }
 
   return {
     name: operation.name,
@@ -134,6 +141,7 @@ export const toolForOperation = (operation: Operation) => {
       required: [
         ...(pathNames.length ? ["pathParams"] : []),
         ...(operation.confirmationRequired ? ["confirm"] : []),
+        ...(operation.idempotencyKeyRequired ? ["idempotencyKey"] : []),
       ],
       additionalProperties: false,
     },

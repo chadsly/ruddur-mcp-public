@@ -39,6 +39,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       content: [{ type: "text", text: `${operation.name} requires confirm=true after explicit user confirmation.` }],
     };
   }
+  if (operation.idempotencyKeyRequired && !args.idempotencyKey?.trim()) {
+    return {
+      isError: true,
+      content: [{ type: "text", text: `${operation.name} requires a non-empty idempotencyKey.` }],
+    };
+  }
 
   try {
     const result = await client.call(operation, args);

@@ -28,6 +28,7 @@ export type Operation = {
   mutation?: boolean;
   destructive?: boolean;
   confirmationRequired?: boolean;
+  idempotencyKeyRequired?: boolean;
 };
 
 export type ToolArguments = {
@@ -35,4 +36,5 @@ export type ToolArguments = {
   query?: Record<string, string | number | boolean | Array<string | number | boolean> | null | undefined>;
   body?: unknown;
   confirm?: boolean;
+  idempotencyKey?: string;
 };

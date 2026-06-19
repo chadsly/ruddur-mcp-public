@@ -15,10 +15,15 @@ test("client adds bearer auth, query parameters, and JSON body", async () => {
   const operation = operationByName.get("ruddur_create_heading");
   assert.ok(operation);
   const client = new RuddurClient("https://api.example.test", "secret-token", 1000, fetchImpl);
-  const result = await client.call(operation, { query: { source: "mcp" }, body: { name: "Plan" } });
+  const result = await client.call(operation, {
+    query: { source: "mcp" },
+    body: { name: "Plan" },
+    idempotencyKey: "audit-1",
+  });
 
   assert.equal(captured.url, "https://api.example.test/api/creator/headings?source=mcp");
   assert.equal(new Headers(captured.init?.headers).get("Authorization"), "Bearer secret-token");
+  assert.equal(new Headers(captured.init?.headers).get("Idempotency-Key"), "audit-1");
   assert.equal(captured.init?.body, JSON.stringify({ name: "Plan" }));
   assert.deepEqual(result, { status: 201, body: { ok: true } });
 });
