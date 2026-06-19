@@ -24,6 +24,19 @@ Set `RUDDUR_MCP_ALLOW_MUTATIONS=false` to run read-only. Delete, restore, publis
 
 ## Codex
 
+No clone is required when installing from the public GitLab repository. Add this to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.ruddur]
+command = "npx"
+args = ["-y", "git+https://gitlab.com/ruddur1/ruddur-mcp.git"]
+env = { RUDDUR_MCP_ENV_FILE = "/absolute/path/to/your/.env" }
+```
+
+The referenced `.env` must define `RUDDUR_CREATOR_API_TOKEN`. The server defaults `RUDDUR_API_BASE` to `https://ruddur.com`.
+
+Alternatively, for a locally cloned checkout:
+
 Add this to `~/.codex/config.toml`:
 
 ```toml
