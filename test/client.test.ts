@@ -23,6 +23,7 @@ test("client adds bearer auth, query parameters, and JSON body", async () => {
 
   assert.equal(captured.url, "https://api.example.test/api/creator/headings?source=mcp");
   assert.equal(new Headers(captured.init?.headers).get("Authorization"), "Bearer secret-token");
+  assert.equal(new Headers(captured.init?.headers).get("Content-Type"), "application/json");
   assert.equal(new Headers(captured.init?.headers).get("Idempotency-Key"), "audit-1");
   assert.equal(captured.init?.body, JSON.stringify({ name: "Plan" }));
   assert.deepEqual(result, { status: 201, body: { ok: true } });

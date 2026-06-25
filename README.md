@@ -50,16 +50,20 @@ Restart Codex after changing MCP configuration.
 
 ## Claude Code
 
+No clone is required when installing from the public GitLab repository:
+
 ```bash
 claude mcp add-json ruddur '{
   "type": "stdio",
-  "command": "node",
-  "args": ["/absolute/path/to/ruddur-mcp/dist/index.js"],
+  "command": "npx",
+  "args": ["-y", "git+https://gitlab.com/ruddur1/ruddur-mcp.git"],
   "env": {
-    "RUDDUR_MCP_ENV_FILE": "/absolute/path/to/ruddur-mcp/.env"
+    "RUDDUR_MCP_ENV_FILE": "/absolute/path/to/your/.env"
   }
 }'
 ```
+
+Set `RUDDUR_MCP_ALLOW_MUTATIONS=false` for read-only use. Set `RUDDUR_MCP_ALLOW_MUTATIONS=true` when Claude should see create/update tools such as `ruddur_create_heading` and `ruddur_create_waypoint`.
 
 ## Security
 
