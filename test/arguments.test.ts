@@ -106,3 +106,152 @@ test("preserves existing creator assessment config", () => {
 
   assert.deepEqual((args.body as { waypoints: Array<{ creatorAssessmentConfig: unknown }> }).waypoints[0].creatorAssessmentConfig, existingConfig);
 });
+
+test("normalizes marketplace creator JSON into listing and heading payload", () => {
+  const operation = operationByName.get("ruddur_create_marketplace_listing");
+  assert.ok(operation);
+
+  const args = normalizeToolArguments(operation, {
+    title: "Money and Marriage",
+    marketplace: {
+      description: "Understand your financial relationship.",
+      price: "0",
+      currency: "usd",
+      status: "published",
+      tags: "money, marriage",
+    },
+    waypoints: [{ title: "Assess Your Money Mindset" }],
+  });
+
+  assert.deepEqual(args.body, {
+    name: "Money and Marriage",
+    description: "Understand your financial relationship.",
+    price: "0",
+    currency: "USD",
+    status: "PUBLISHED",
+    tags: ["money", "marriage"],
+    heading: {
+      name: "Money and Marriage",
+      nodes: undefined,
+      edges: undefined,
+      waypoints: [{
+        title: "Assess Your Money Mindset",
+        creatorAssessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+      }],
+    },
+  });
+});
+
+test("normalizes media aliases", () => {
+  const rename = operationByName.get("ruddur_update_media_asset");
+  assert.ok(rename);
+  assert.deepEqual(normalizeToolArguments(rename, { title: "Cover Image" }).body, { title: "Cover Image", name: "Cover Image" });
+
+  const presign = operationByName.get("ruddur_create_media_upload");
+  assert.ok(presign);
+  assert.deepEqual(normalizeToolArguments(presign, {
+    name: "cover.png",
+    mimeType: "image/png",
+    size: 1234,
+  }).body, {
+    name: "cover.png",
+    mimeType: "image/png",
+    size: 1234,
+    fileName: "cover.png",
+    contentType: "image/png",
+    fileSize: 1234,
+  });
+});
+
+test("normalizes coupon aliases", () => {
+  const operation = operationByName.get("ruddur_create_coupon");
+  assert.ok(operation);
+
+  const args = normalizeToolArguments(operation, {
+    marketplaceListingId: "listing-1",
+    promoCode: "save20",
+    percentOff: 20,
+    expires: "2026-12-31",
+    usageLimit: 50,
+  });
+
+  assert.deepEqual(args.body, {
+    marketplaceListingId: "listing-1",
+    promoCode: "save20",
+    percentOff: 20,
+    expires: "2026-12-31",
+    usageLimit: 50,
+    listingId: "listing-1",
+    expiresAt: "2026-12-31",
+    maxRedemptions: 50,
+    code: "save20",
+    discountType: "PERCENT",
+    discountValue: 20,
+  });
+});
+
+test("normalizes waypoint placement aliases", () => {
+  const operation = operationByName.get("ruddur_attach_waypoint");
+  assert.ok(operation);
+
+  const args = normalizeToolArguments(operation, {
+    heading: "heading-1",
+    index: 2,
+    state: "not_started",
+  });
+
+  assert.deepEqual(args.body, {
+    heading: "heading-1",
+    index: 2,
+    state: "not_started",
+    headingId: "heading-1",
+    placement: {
+      order: 2,
+      status: "not_started",
+    },
+  });
+});
+
+test("normalizes collaborator and creator profile aliases", () => {
+  const collaborator = operationByName.get("ruddur_add_heading_collaborator");
+  assert.ok(collaborator);
+  assert.deepEqual(normalizeToolArguments(collaborator, {
+    userId: "user-2",
+    permission: "editor",
+  }).body, {
+    userId: "user-2",
+    permission: "editor",
+    collaboratorUserId: "user-2",
+    role: "editor",
+  });
+
+  const profile = operationByName.get("ruddur_update_creator_profile");
+  assert.ok(profile);
+  assert.deepEqual(normalizeToolArguments(profile, { name: "Chad" }).body, { name: "Chad", displayName: "Chad" });
+});
+
+test("normalizes analytics and entitlement aliases", () => {
+  const event = operationByName.get("ruddur_record_creator_event");
+  assert.ok(event);
+  assert.deepEqual(normalizeToolArguments(event, {
+    event: "heading_created",
+    timestamp: "2026-06-26T00:00:00.000Z",
+  }).body, {
+    event: "heading_created",
+    timestamp: "2026-06-26T00:00:00.000Z",
+    eventType: "heading_created",
+    occurredAt: "2026-06-26T00:00:00.000Z",
+  });
+
+  const entitlement = operationByName.get("ruddur_verify_entitlement");
+  assert.ok(entitlement);
+  assert.deepEqual(normalizeToolArguments(entitlement, {
+    marketplaceListingId: "listing-1",
+    customerUserId: "user-3",
+  }).body, {
+    marketplaceListingId: "listing-1",
+    customerUserId: "user-3",
+    listingId: "listing-1",
+    userId: "user-3",
+  });
+});
