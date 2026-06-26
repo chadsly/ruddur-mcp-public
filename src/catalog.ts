@@ -1,4 +1,5 @@
 import type { CreatorScope, Operation, ToolArguments } from "./types.js";
+import { BODY_SCHEMA_DESCRIPTION, operationGuidance } from "./instructions.js";
 
 const one = (scope: CreatorScope) => ({ scopes: [scope] });
 const any = (...scopes: CreatorScope[]) => ({ scopes, mode: "any" as const });
@@ -106,7 +107,7 @@ export const toolForOperation = (operation: Operation) => {
     },
     body: {
       anyOf: [{ type: "object" }, { type: "array" }, { type: "string" }],
-      description: "JSON request body for POST, PUT, or PATCH operations.",
+      description: BODY_SCHEMA_DESCRIPTION,
     },
   };
   if (pathNames.length) {
@@ -135,7 +136,7 @@ export const toolForOperation = (operation: Operation) => {
 
   return {
     name: operation.name,
-    description: `${operation.description} Requires ${operation.scope.mode === "any" ? "one of" : ""} scope: ${operation.scope.scopes.join(", ")}.`,
+    description: `${operation.description}${operationGuidance(operation.name)} Requires ${operation.scope.mode === "any" ? "one of" : ""} scope: ${operation.scope.scopes.join(", ")}.`,
     inputSchema: {
       type: "object",
       properties,

@@ -7,6 +7,7 @@ import { loadConfig, loadDotEnv } from "./config.js";
 import { operationByName, toolForOperation, visibleOperations } from "./catalog.js";
 import { RuddurApiError, RuddurClient } from "./client.js";
 import { normalizeToolArguments } from "./arguments.js";
+import { RUDDUR_MCP_INSTRUCTIONS } from "./instructions.js";
 import type { ToolArguments } from "./types.js";
 
 loadDotEnv();
@@ -17,7 +18,7 @@ const client = new RuddurClient(config.apiBase, config.token, config.timeoutMs);
 
 const server = new Server(
   { name: "ruddur-mcp", version: "0.1.0" },
-  { capabilities: { tools: {} } },
+  { capabilities: { tools: {} }, instructions: RUDDUR_MCP_INSTRUCTIONS },
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({

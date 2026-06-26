@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildPath, operationByName, visibleOperations } from "../src/catalog.js";
+import { buildPath, operationByName, toolForOperation, visibleOperations } from "../src/catalog.js";
 
 test("scope filtering advertises only permitted operations", () => {
   const operations = visibleOperations(new Set(["content.read"]), true);
@@ -20,4 +20,14 @@ test("path parameters are encoded and required", () => {
   assert.ok(operation);
   assert.equal(buildPath(operation, { pathParams: { id: "heading/one" } }), "/api/creator/headings/heading%2Fone");
   assert.throws(() => buildPath(operation, {}), /pathParams.id is required/);
+});
+
+test("tool descriptions include MCP normalization guidance", () => {
+  const operation = operationByName.get("ruddur_create_marketplace_listing");
+  assert.ok(operation);
+
+  const tool = toolForOperation(operation);
+
+  assert.match(tool.description, /natural marketplace payloads/);
+  assert.match(JSON.stringify(tool.inputSchema), /assessmentConfig is optional/);
 });
