@@ -105,6 +105,7 @@ export const toolForOperation = (operation: Operation) => {
       additionalProperties: { type: ["string", "number", "boolean", "array", "null"] },
     },
     body: {
+      anyOf: [{ type: "object" }, { type: "array" }, { type: "string" }],
       description: "JSON request body for POST, PUT, or PATCH operations.",
     },
   };

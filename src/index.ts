@@ -6,6 +6,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { loadConfig, loadDotEnv } from "./config.js";
 import { operationByName, toolForOperation, visibleOperations } from "./catalog.js";
 import { RuddurApiError, RuddurClient } from "./client.js";
+import { normalizeToolArguments } from "./arguments.js";
 import type { ToolArguments } from "./types.js";
 
 loadDotEnv();
@@ -32,7 +33,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     };
   }
 
-  const args = (request.params.arguments || {}) as ToolArguments;
+  let args: ToolArguments;
+  try {
+    args = normalizeToolArguments(operation, request.params.arguments || {});
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { isError: true, content: [{ type: "text", text: message }] };
+  }
   if (operation.confirmationRequired && args.confirm !== true) {
     return {
       isError: true,
