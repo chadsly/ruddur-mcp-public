@@ -75,6 +75,80 @@ const normalizeTags = (value: unknown) => {
   return value;
 };
 
+const slugify = (value: unknown, fallback: string) => {
+  const source = typeof value === "string" && value.trim().length > 0 ? value : fallback;
+  const slug = source
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || fallback;
+};
+
+const withDefaultCanvas = (heading: Record<string, unknown>) => {
+  if (!Array.isArray(heading.waypoints)) return heading;
+  const result: Record<string, unknown> = { ...heading };
+  const usedNodeIds = new Set<string>();
+
+  const waypoints = heading.waypoints.map((rawWaypoint, index) => {
+    const waypoint = withCreatorAssessmentConfig(rawWaypoint);
+    if (!isRecord(waypoint)) return waypoint;
+    const placement = isRecord(waypoint.placement) ? { ...waypoint.placement } : {};
+    const rawNodeId = firstPresent(waypoint, ["nodeId", "id", "waypointId"]) ?? placement.nodeId;
+    const baseNodeId = slugify(rawNodeId ?? waypoint.title, `waypoint-${index + 1}`);
+    let nodeId = baseNodeId;
+    let suffix = 2;
+    while (usedNodeIds.has(nodeId)) {
+      nodeId = `${baseNodeId}-${suffix}`;
+      suffix += 1;
+    }
+    usedNodeIds.add(nodeId);
+    placement.nodeId = typeof placement.nodeId === "string" && placement.nodeId.trim() ? placement.nodeId : nodeId;
+    if (placement.order === undefined) placement.order = index;
+    if (placement.status === undefined) placement.status = "not_started";
+    if (!isRecord(placement.position)) placement.position = { x: 200 + index * 220, y: 160 + index * 80 };
+    if (placement.type === undefined) placement.type = "default";
+    return {
+      ...waypoint,
+      id: typeof waypoint.id === "string" && waypoint.id.trim() ? waypoint.id : nodeId,
+      placement,
+    };
+  });
+
+  result.waypoints = waypoints;
+  if (!Array.isArray(result.nodes) || result.nodes.length === 0) {
+    result.nodes = waypoints
+      .filter(isRecord)
+      .map((waypoint, index) => {
+        const placement = isRecord(waypoint.placement) ? waypoint.placement : {};
+        const nodeId = typeof placement.nodeId === "string" && placement.nodeId.trim() ? placement.nodeId : `waypoint-${index + 1}`;
+        const title = typeof waypoint.title === "string" && waypoint.title.trim() ? waypoint.title.trim() : `Waypoint ${index + 1}`;
+        return {
+          id: nodeId,
+          type: typeof placement.type === "string" ? placement.type : "default",
+          data: {
+            label: title,
+            labelText: title,
+            status: typeof placement.status === "string" ? placement.status : "not_started",
+          },
+          position: isRecord(placement.position) ? placement.position : { x: 200 + index * 220, y: 160 + index * 80 },
+          status: typeof placement.status === "string" ? placement.status : "not_started",
+        };
+      });
+  }
+  if (!Array.isArray(result.edges)) {
+    const nodes = Array.isArray(result.nodes) ? result.nodes.filter(isRecord) : [];
+    result.edges = nodes.slice(0, -1).map((node, index) => ({
+      id: `${String(node.id)}->${String(nodes[index + 1].id)}`,
+      source: String(node.id),
+      target: String(nodes[index + 1].id),
+      animated: true,
+      markerEnd: { type: "arrowclosed" },
+    }));
+  }
+  return result;
+};
+
 const withCreatorAssessmentConfig = (waypoint: unknown) => {
   if (!isRecord(waypoint)) return waypoint;
   if (isRecord(waypoint.assessmentConfig) && Object.keys(waypoint.assessmentConfig).length > 0) {
@@ -101,7 +175,10 @@ const normalizeWaypointConfigs = (value: unknown): unknown => {
     normalized.waypoints = normalized.waypoints.map(withCreatorAssessmentConfig);
   }
   if (Array.isArray(normalized.headings)) {
-    normalized.headings = normalized.headings.map(normalizeWaypointConfigs);
+    normalized.headings = normalized.headings.map((heading) => {
+      const normalizedHeading = normalizeWaypointConfigs(heading);
+      return isRecord(normalizedHeading) ? withDefaultCanvas(normalizedHeading) : normalizedHeading;
+    });
   }
   return normalized;
 };
@@ -114,7 +191,7 @@ const normalizeHeadingLikeBody = (body: unknown): unknown => {
   if (!isRecord(normalized)) return normalized;
   const result: Record<string, unknown> = { ...normalized };
   copyAlias(result, "name", ["title"]);
-  return result;
+  return withDefaultCanvas(result);
 };
 
 const normalizeWaypointPlacementBody = (body: unknown): unknown => {

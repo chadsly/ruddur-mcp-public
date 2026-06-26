@@ -51,9 +51,29 @@ test("adds default creator assessment config to heading waypoints", () => {
 
   assert.deepEqual(args.body, {
     name: "Money and Marriage",
+    nodes: [{
+      id: "assess-your-money-mindset",
+      type: "default",
+      data: {
+        label: "Assess Your Money Mindset",
+        labelText: "Assess Your Money Mindset",
+        status: "not_started",
+      },
+      position: { x: 200, y: 160 },
+      status: "not_started",
+    }],
+    edges: [],
     waypoints: [{
+      id: "assess-your-money-mindset",
       title: "Assess Your Money Mindset",
       assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+      placement: {
+        nodeId: "assess-your-money-mindset",
+        order: 0,
+        status: "not_started",
+        position: { x: 200, y: 160 },
+        type: "default",
+      },
     }],
   });
 });
@@ -74,9 +94,29 @@ test("adds default creator assessment config to imported heading waypoints", () 
   assert.deepEqual(args.body, {
     headings: [{
       name: "Money and Marriage",
+      nodes: [{
+        id: "assess-your-money-mindset",
+        type: "default",
+        data: {
+          label: "Assess Your Money Mindset",
+          labelText: "Assess Your Money Mindset",
+          status: "not_started",
+        },
+        position: { x: 200, y: 160 },
+        status: "not_started",
+      }],
+      edges: [],
       waypoints: [{
+        id: "assess-your-money-mindset",
         title: "Assess Your Money Mindset",
         assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+        placement: {
+          nodeId: "assess-your-money-mindset",
+          order: 0,
+          status: "not_started",
+          position: { x: 200, y: 160 },
+          type: "default",
+        },
       }],
     }],
   });
@@ -149,14 +189,53 @@ test("normalizes marketplace creator JSON into listing and heading payload", () 
     tags: ["money", "marriage"],
     heading: {
       name: "Money and Marriage",
-      nodes: undefined,
-      edges: undefined,
+      nodes: [{
+        id: "assess-your-money-mindset",
+        type: "default",
+        data: {
+          label: "Assess Your Money Mindset",
+          labelText: "Assess Your Money Mindset",
+          status: "not_started",
+        },
+        position: { x: 200, y: 160 },
+        status: "not_started",
+      }],
+      edges: [],
       waypoints: [{
+        id: "assess-your-money-mindset",
         title: "Assess Your Money Mindset",
         assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+        placement: {
+          nodeId: "assess-your-money-mindset",
+          order: 0,
+          status: "not_started",
+          position: { x: 200, y: 160 },
+          type: "default",
+        },
       }],
     },
   });
+});
+
+test("adds sequential canvas edges for multi-waypoint headings", () => {
+  const operation = operationByName.get("ruddur_create_heading");
+  assert.ok(operation);
+
+  const args = normalizeToolArguments(operation, {
+    name: "Planning",
+    waypoints: [
+      { title: "Choose a Planning Time" },
+      { title: "Review Commitments" },
+    ],
+  });
+
+  assert.deepEqual((args.body as { edges: unknown[] }).edges, [{
+    id: "choose-a-planning-time->review-commitments",
+    source: "choose-a-planning-time",
+    target: "review-commitments",
+    animated: true,
+    markerEnd: { type: "arrowclosed" },
+  }]);
 });
 
 test("normalizes media aliases", () => {
