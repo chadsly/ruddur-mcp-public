@@ -53,7 +53,7 @@ test("adds default creator assessment config to heading waypoints", () => {
     name: "Money and Marriage",
     waypoints: [{
       title: "Assess Your Money Mindset",
-      creatorAssessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+      assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
     }],
   });
 });
@@ -76,7 +76,7 @@ test("adds default creator assessment config to imported heading waypoints", () 
       name: "Money and Marriage",
       waypoints: [{
         title: "Assess Your Money Mindset",
-        creatorAssessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+        assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
       }],
     }],
   });
@@ -90,21 +90,38 @@ test("adds default creator assessment config to standalone waypoint writes", () 
 
   assert.deepEqual(args.body, {
     title: "Assess Your Money Mindset",
-    creatorAssessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+    assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
   });
 });
 
-test("preserves existing creator assessment config", () => {
+test("preserves existing assessment config", () => {
   const operation = operationByName.get("ruddur_create_heading");
   assert.ok(operation);
 
-  const existingConfig = { version: "schema-v1", mode: "checklist", required: true };
+  const existingConfig = { kind: "creator-assessment", schemaVersion: 1, version: "2.0.0" };
   const args = normalizeToolArguments(operation, {
     name: "Money and Marriage",
-    waypoints: [{ title: "Assess Your Money Mindset", creatorAssessmentConfig: existingConfig }],
+    waypoints: [{ title: "Assess Your Money Mindset", assessmentConfig: existingConfig }],
   });
 
-  assert.deepEqual((args.body as { waypoints: Array<{ creatorAssessmentConfig: unknown }> }).waypoints[0].creatorAssessmentConfig, existingConfig);
+  assert.deepEqual((args.body as { waypoints: Array<{ assessmentConfig: unknown }> }).waypoints[0].assessmentConfig, existingConfig);
+});
+
+test("maps creatorAssessmentConfig alias to assessmentConfig", () => {
+  const operation = operationByName.get("ruddur_create_waypoint");
+  assert.ok(operation);
+
+  const existingConfig = { kind: "creator-assessment", schemaVersion: 1, version: "2.0.0" };
+  const args = normalizeToolArguments(operation, {
+    title: "Assess Your Money Mindset",
+    creatorAssessmentConfig: existingConfig,
+  });
+
+  assert.deepEqual(args.body, {
+    title: "Assess Your Money Mindset",
+    creatorAssessmentConfig: existingConfig,
+    assessmentConfig: existingConfig,
+  });
 });
 
 test("normalizes marketplace creator JSON into listing and heading payload", () => {
@@ -136,7 +153,7 @@ test("normalizes marketplace creator JSON into listing and heading payload", () 
       edges: undefined,
       waypoints: [{
         title: "Assess Your Money Mindset",
-        creatorAssessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+        assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
       }],
     },
   });

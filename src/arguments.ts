@@ -9,10 +9,35 @@ const COLLABORATOR_OPERATIONS = new Set(["ruddur_add_heading_collaborator", "rud
 const MEDIA_LINK_OPERATIONS = new Set(["ruddur_attach_media_asset", "ruddur_detach_media_asset"]);
 
 export const DEFAULT_CREATOR_ASSESSMENT_CONFIG = {
-  version: "schema-v1",
-  mode: "reflection",
-  required: false,
-  prompt: "Reflect on what you completed for this waypoint and note the next action you will take.",
+  kind: "creator-assessment",
+  schemaVersion: 1,
+  version: "1.0.0",
+  status: "draft",
+  title: "Waypoint reflection",
+  summary: "A lightweight reflection check for this waypoint.",
+  scoring: {
+    mode: "sum",
+    scaleMin: 0,
+    scaleMax: 1,
+  },
+  result: {
+    shape: "score",
+    title: "Reflection complete",
+    description: "Use this assessment to capture completion evidence for the waypoint.",
+  },
+  publish: {
+    requiresValidation: false,
+    allowDraftPreview: true,
+    reviewRequired: false,
+  },
+  analytics: {
+    eventPrefix: "creator_assessment",
+    tags: ["creator", "assessment", "waypoint"],
+  },
+  persistence: {
+    target: "metadata",
+    field: "creatorAssessmentScore",
+  },
 };
 
 const parseJsonBodyString = (value: string) => {
@@ -52,12 +77,18 @@ const normalizeTags = (value: unknown) => {
 
 const withCreatorAssessmentConfig = (waypoint: unknown) => {
   if (!isRecord(waypoint)) return waypoint;
-  if (isRecord(waypoint.creatorAssessmentConfig) && Object.keys(waypoint.creatorAssessmentConfig).length > 0) {
+  if (isRecord(waypoint.assessmentConfig) && Object.keys(waypoint.assessmentConfig).length > 0) {
     return waypoint;
+  }
+  if (isRecord(waypoint.creatorAssessmentConfig) && Object.keys(waypoint.creatorAssessmentConfig).length > 0) {
+    return {
+      ...waypoint,
+      assessmentConfig: waypoint.creatorAssessmentConfig,
+    };
   }
   return {
     ...waypoint,
-    creatorAssessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
+    assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
   };
 };
 
