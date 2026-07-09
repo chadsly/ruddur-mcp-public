@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DEFAULT_CREATOR_ASSESSMENT_CONFIG, normalizeToolArguments } from "../src/arguments.js";
+import { normalizeToolArguments } from "../src/arguments.js";
 import { operationByName } from "../src/catalog.js";
 
 test("normalizes top-level write fields into the request body", () => {
@@ -40,7 +40,7 @@ test("keeps path, query, confirmation, and idempotency arguments out of inferred
   assert.deepEqual(args.body, { status: "draft" });
 });
 
-test("adds default creator assessment config to heading waypoints", () => {
+test("does not add assessment config to ordinary heading waypoints", () => {
   const operation = operationByName.get("ruddur_create_heading");
   assert.ok(operation);
 
@@ -66,7 +66,6 @@ test("adds default creator assessment config to heading waypoints", () => {
     waypoints: [{
       id: "assess-your-money-mindset",
       title: "Assess Your Money Mindset",
-      assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
       placement: {
         nodeId: "assess-your-money-mindset",
         order: 0,
@@ -78,7 +77,7 @@ test("adds default creator assessment config to heading waypoints", () => {
   });
 });
 
-test("adds default creator assessment config to imported heading waypoints", () => {
+test("does not add assessment config to imported ordinary heading waypoints", () => {
   const operation = operationByName.get("ruddur_import_headings");
   assert.ok(operation);
 
@@ -109,7 +108,6 @@ test("adds default creator assessment config to imported heading waypoints", () 
       waypoints: [{
         id: "assess-your-money-mindset",
         title: "Assess Your Money Mindset",
-        assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
         placement: {
           nodeId: "assess-your-money-mindset",
           order: 0,
@@ -122,16 +120,13 @@ test("adds default creator assessment config to imported heading waypoints", () 
   });
 });
 
-test("adds default creator assessment config to standalone waypoint writes", () => {
+test("does not add assessment config to ordinary standalone waypoint writes", () => {
   const operation = operationByName.get("ruddur_create_waypoint");
   assert.ok(operation);
 
   const args = normalizeToolArguments(operation, { title: "Assess Your Money Mindset" });
 
-  assert.deepEqual(args.body, {
-    title: "Assess Your Money Mindset",
-    assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
-  });
+  assert.deepEqual(args.body, { title: "Assess Your Money Mindset" });
 });
 
 test("preserves existing assessment config", () => {
@@ -204,7 +199,6 @@ test("normalizes marketplace creator JSON into listing and heading payload", () 
       waypoints: [{
         id: "assess-your-money-mindset",
         title: "Assess Your Money Mindset",
-        assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
         placement: {
           nodeId: "assess-your-money-mindset",
           order: 0,
