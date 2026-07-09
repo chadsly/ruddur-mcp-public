@@ -147,7 +147,7 @@ Create a useful private draft that you can review and continue developing:
 > 4. Schedule the first action for each priority.
 > 5. Complete a short end-of-week reflection.
 >
-> Give each Waypoint a concise, useful description and include a valid creatorAssessmentConfig. Keep the Heading private and in draft status. Do not publish it. When finished, show me the Heading ID, each Waypoint ID, and a summary of what you created.
+> Give each Waypoint a concise, useful description. Omit creatorAssessmentConfig unless I explicitly ask for an assessment-style waypoint. Keep the Heading private and in draft status. Do not publish it. When finished, show me the Heading ID, each Waypoint ID, and a summary of what you created.
 
 Open Ruddur and review the draft. Confirm that:
 
@@ -188,9 +188,9 @@ Set `RUDDUR_MCP_ALLOW_MUTATIONS=true` in `~/.ruddur/.env`, save the file, and re
 
 Claude is still running the MCP server in read-only mode, or the token was restricted to read-only scopes. First confirm `RUDDUR_MCP_ALLOW_MUTATIONS=true` is saved in `~/.ruddur/.env`, then fully quit and restart Claude Code. If the write tools still do not appear, ask your Ruddur administrator for a Creator API token that includes content management permission.
 
-### Claude reports a missing `creatorAssessmentConfig`
+### Claude asks about `creatorAssessmentConfig`
 
-Tell Claude to include a valid `creatorAssessmentConfig` on every Waypoint. An empty `{}` is not valid.
+Tell Claude to omit `creatorAssessmentConfig` for ordinary growth-path Waypoints. Include a valid `creatorAssessmentConfig` only for explicit assessment-style Waypoints. An empty `{}` is not valid.
 
 ## Security Reminders
 

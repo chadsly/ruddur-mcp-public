@@ -8,38 +8,6 @@ const MARKETPLACE_LISTING_OPERATIONS = new Set(["ruddur_create_marketplace_listi
 const COLLABORATOR_OPERATIONS = new Set(["ruddur_add_heading_collaborator", "ruddur_update_heading_collaborator"]);
 const MEDIA_LINK_OPERATIONS = new Set(["ruddur_attach_media_asset", "ruddur_detach_media_asset"]);
 
-export const DEFAULT_CREATOR_ASSESSMENT_CONFIG = {
-  kind: "creator-assessment",
-  schemaVersion: 1,
-  version: "1.0.0",
-  status: "draft",
-  title: "Waypoint reflection",
-  summary: "A lightweight reflection check for this waypoint.",
-  scoring: {
-    mode: "sum",
-    scaleMin: 0,
-    scaleMax: 1,
-  },
-  result: {
-    shape: "score",
-    title: "Reflection complete",
-    description: "Use this assessment to capture completion evidence for the waypoint.",
-  },
-  publish: {
-    requiresValidation: false,
-    allowDraftPreview: true,
-    reviewRequired: false,
-  },
-  analytics: {
-    eventPrefix: "creator_assessment",
-    tags: ["creator", "assessment", "waypoint"],
-  },
-  persistence: {
-    target: "metadata",
-    field: "creatorAssessmentScore",
-  },
-};
-
 const parseJsonBodyString = (value: string) => {
   const trimmed = value.trim();
   if (!trimmed) throw new Error("body must not be an empty string.");
@@ -160,10 +128,7 @@ const withCreatorAssessmentConfig = (waypoint: unknown) => {
       assessmentConfig: waypoint.creatorAssessmentConfig,
     };
   }
-  return {
-    ...waypoint,
-    assessmentConfig: DEFAULT_CREATOR_ASSESSMENT_CONFIG,
-  };
+  return waypoint;
 };
 
 const normalizeWaypointConfigs = (value: unknown): unknown => {

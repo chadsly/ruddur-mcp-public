@@ -1,6 +1,6 @@
 export const RUDDUR_MCP_INSTRUCTIONS = [
   "Use Ruddur tools with natural creator payloads; the MCP server normalizes common aliases before calling the Ruddur API.",
-  "For Headings and Waypoints, you do not need to ask the user for assessmentConfig. If a waypoint is missing assessmentConfig, the server supplies a publishable default creator assessment config.",
+  "For normal Headings and Waypoints, omit assessmentConfig. Only include assessmentConfig or creatorAssessmentConfig when the user explicitly wants an assessment-style waypoint.",
   "If a user provides creatorAssessmentConfig, send it as-is; the server maps that alias to assessmentConfig for the Ruddur API.",
   "For marketplace publishing, prefer ruddur_create_marketplace_listing with either an existing headingId or a natural payload containing marketplace details and waypoints. Keep status as DRAFT unless the user explicitly asks to publish.",
   "Sensitive or destructive tools require confirm=true only after explicit user confirmation.",
@@ -9,15 +9,15 @@ export const RUDDUR_MCP_INSTRUCTIONS = [
 export const BODY_SCHEMA_DESCRIPTION = [
   "JSON request body for POST, PUT, or PATCH operations.",
   "You may pass natural Ruddur fields directly at the top level instead of wrapping them in body; the server will infer the body.",
-  "For waypoint payloads, assessmentConfig is optional because the server supplies a publishable default when missing.",
+  "For normal waypoint payloads, omit assessmentConfig. Use assessmentConfig only for assessment-style waypoints.",
 ].join(" ");
 
 export const operationGuidance = (operationName: string) => {
   if (["ruddur_create_heading", "ruddur_import_headings", "ruddur_create_waypoint", "ruddur_update_waypoint"].includes(operationName)) {
-    return " Waypoint assessmentConfig is optional; the MCP server supplies a valid publishable default when missing and maps creatorAssessmentConfig to assessmentConfig.";
+    return " Omit assessmentConfig for ordinary waypoints; include it only for explicit assessment-style waypoints. The MCP server maps creatorAssessmentConfig to assessmentConfig when provided.";
   }
   if (["ruddur_create_marketplace_listing", "ruddur_update_marketplace_listing"].includes(operationName)) {
-    return " The MCP server accepts natural marketplace payloads, including marketplace details, title/name aliases, comma-separated tags, lowercase status/currency, and top-level waypoints converted into a heading payload with publishable assessmentConfig defaults.";
+    return " The MCP server accepts natural marketplace payloads, including marketplace details, title/name aliases, comma-separated tags, lowercase status/currency, and top-level waypoints converted into a heading payload. Ordinary waypoints should not include assessmentConfig.";
   }
   if (["ruddur_attach_waypoint", "ruddur_update_waypoint_placement"].includes(operationName)) {
     return " The MCP server accepts placement aliases such as heading, index, state, and sortOrder.";
