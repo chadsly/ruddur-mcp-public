@@ -29,5 +29,8 @@ test("tool descriptions include MCP normalization guidance", () => {
   const tool = toolForOperation(operation);
 
   assert.match(tool.description, /natural marketplace payloads/);
+  assert.match(tool.description, /outcome-focused and buyer-facing/);
+  assert.match(tool.description, /question-format, free-text, PII\/data-handling/);
+  assert.match(tool.description, /unless explicitly requested or specifically required/);
   assert.match(JSON.stringify(tool.inputSchema), /omit assessmentConfig/);
 });

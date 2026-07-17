@@ -3,6 +3,7 @@ export const RUDDUR_MCP_INSTRUCTIONS = [
   "For normal Headings and Waypoints, omit assessmentConfig. Only include assessmentConfig or creatorAssessmentConfig when the user explicitly wants an assessment-style waypoint.",
   "If a user provides creatorAssessmentConfig, send it as-is; the server maps that alias to assessmentConfig for the Ruddur API.",
   "For marketplace publishing, prefer ruddur_create_marketplace_listing with either an existing headingId or a natural payload containing marketplace details and waypoints. Keep status as DRAFT unless the user explicitly asks to publish.",
+  "Write marketplace descriptions as buyer-facing copy that leads with the problem solved, expected outcome, and practical value. Do not add implementation details about question format, free-text fields, PII or data-handling mechanics, or generic educational and non-diagnostic disclaimers unless the user explicitly requests them or a specific legal or product requirement requires them.",
   "Sensitive or destructive tools require confirm=true only after explicit user confirmation.",
 ].join(" ");
 
@@ -17,7 +18,7 @@ export const operationGuidance = (operationName: string) => {
     return " Omit assessmentConfig for ordinary waypoints; include it only for explicit assessment-style waypoints. The MCP server maps creatorAssessmentConfig to assessmentConfig when provided.";
   }
   if (["ruddur_create_marketplace_listing", "ruddur_update_marketplace_listing"].includes(operationName)) {
-    return " The MCP server accepts natural marketplace payloads, including marketplace details, title/name aliases, comma-separated tags, lowercase status/currency, and top-level waypoints converted into a heading payload. Ordinary waypoints should not include assessmentConfig.";
+    return " The MCP server accepts natural marketplace payloads, including marketplace details, title/name aliases, comma-separated tags, lowercase status/currency, and top-level waypoints converted into a heading payload. Ordinary waypoints should not include assessmentConfig. Keep marketplace descriptions outcome-focused and buyer-facing. Do not add question-format, free-text, PII/data-handling, or generic educational/non-diagnostic boilerplate unless explicitly requested or specifically required; place necessary disclosures in a dedicated assessment introduction, help, or consent surface when available.";
   }
   if (["ruddur_attach_waypoint", "ruddur_update_waypoint_placement"].includes(operationName)) {
     return " The MCP server accepts placement aliases such as heading, index, state, and sortOrder.";
