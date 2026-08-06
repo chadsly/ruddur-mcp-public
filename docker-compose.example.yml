@@ -1,0 +1,30 @@
+services:
+  ruddur-mcp:
+    image: ${RUDDUR_MCP_IMAGE:-registry.gitlab.com/ruddur1/ruddur-mcp/app:latest}
+    pull_policy: always
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${RUDDUR_MCP_HOST_PORT:-8080}:8080"
+    environment:
+      PORT: "8080"
+      RUDDUR_API_BASE: http://backend:4000
+      RUDDUR_MCP_PUBLIC_URL: ${RUDDUR_MCP_PUBLIC_URL:?set https://mcp.ruddur.com/mcp}
+      RUDDUR_OAUTH_ISSUER: ${RUDDUR_OAUTH_ISSUER:?set https://ruddur.com}
+      RUDDUR_OAUTH_INTROSPECTION_URL: http://backend:4000/api/oauth/introspect
+      MCP_INTROSPECTION_SECRET: ${MCP_INTROSPECTION_SECRET:?set the same secret on the backend}
+      RUDDUR_MCP_ALLOWED_ORIGINS: ${RUDDUR_MCP_ALLOWED_ORIGINS:-https://mcp.ruddur.com,https://ruddur.com,https://chatgpt.com,https://claude.ai}
+      RUDDUR_MCP_TIMEOUT_MS: ${RUDDUR_MCP_TIMEOUT_MS:-30000}
+    depends_on:
+      - backend
+    networks:
+      - ruddur-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  ruddur-network:
+    external: true
