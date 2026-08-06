@@ -32,7 +32,7 @@ The default branch also publishes `:latest`; Git tags additionally publish an im
 ```bash
 cd ruddur-mcp
 npm install
-cp .env.example .env
+cp .env.stdio.example .env
 npm run build
 ```
 
@@ -44,6 +44,8 @@ RUDDUR_CREATOR_API_TOKEN=your-token
 ```
 
 `RUDDUR_CREATOR_SCOPES` is optional. When present, the server only advertises tools matching those scopes. When absent, it advertises all allowlisted creator tools and lets the Ruddur API enforce the token's actual scopes.
+
+This token-based file is only for local stdio development. Hosted deployments use `.env.example`, which intentionally contains no creator token: each marketplace user's OAuth token arrives as the bearer credential on their MCP request.
 
 Set `RUDDUR_MCP_ALLOW_MUTATIONS=false` to run read-only. Delete, restore, publish/status, and detach operations require `confirm=true` from the calling agent.
 

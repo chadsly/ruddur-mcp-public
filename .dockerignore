@@ -3,6 +3,7 @@
 .env
 .env.*
 !.env.example
+!.env.stdio.example
 node_modules
 dist
 coverage
