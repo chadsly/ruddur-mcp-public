@@ -153,5 +153,6 @@ export const toolForOperation = (operation: Operation) => {
       idempotentHint: operation.method === "GET" || operation.method === "PUT" || operation.method === "DELETE",
       openWorldHint: true,
     },
+    securitySchemes: [{ type: "oauth2", scopes: operation.scope.scopes }],
   };
 };

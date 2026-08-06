@@ -1,0 +1,38 @@
+{
+  "name": "ruddur-plugins",
+  "owner": {
+    "name": "Ruddur",
+    "email": "support@ruddur.com",
+    "url": "https://ruddur.com"
+  },
+  "description": "Official Ruddur plugins for Claude Code",
+  "plugins": [
+    {
+      "name": "ruddur",
+      "displayName": "Ruddur",
+      "source": "./plugins/ruddur-claude",
+      "description": "Create, organize, publish, and manage structured growth paths in Ruddur.",
+      "author": {
+        "name": "Ruddur",
+        "email": "support@ruddur.com",
+        "url": "https://ruddur.com"
+      },
+      "homepage": "https://ruddur.com",
+      "repository": "https://gitlab.com/ruddur1/ruddur-mcp",
+      "keywords": [
+        "growth paths",
+        "goals",
+        "coaching",
+        "marketplace",
+        "productivity"
+      ],
+      "category": "productivity",
+      "tags": [
+        "mcp",
+        "creator tools"
+      ],
+      "strict": true,
+      "defaultEnabled": false
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "name": "ruddur",
+  "version": "0.1.0",
+  "description": "Create, organize, publish, and manage structured growth paths in Ruddur.",
+  "author": {
+    "name": "Ruddur",
+    "email": "support@ruddur.com",
+    "url": "https://ruddur.com"
+  },
+  "homepage": "https://ruddur.com",
+  "repository": "https://gitlab.com/ruddur1/ruddur-mcp",
+  "keywords": [
+    "growth paths",
+    "goals",
+    "coaching",
+    "marketplace",
+    "productivity"
+  ],
+  "interface": {
+    "displayName": "Ruddur",
+    "shortDescription": "Build and manage growth paths",
+    "longDescription": "Turn ideas into structured growth paths, manage headings and actionable waypoints, and publish useful guidance to the Ruddur marketplace.",
+    "developerName": "Ruddur",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://ruddur.com",
+    "privacyPolicyURL": "https://ruddur.com/privacy",
+    "termsOfServiceURL": "https://ruddur.com/terms",
+    "defaultPrompt": [
+      "Show my Ruddur creator profile and recent headings.",
+      "Turn this goal into a Ruddur heading with practical waypoints.",
+      "Review my draft heading and prepare it for the marketplace."
+    ],
+    "brandColor": "#059669"
+  },
+  "mcpServers": "./.mcp.json"
+}

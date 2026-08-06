@@ -1,0 +1,20 @@
+{
+  "name": "ruddur-plugins",
+  "interface": {
+    "displayName": "Ruddur Plugins"
+  },
+  "plugins": [
+    {
+      "name": "ruddur",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ruddur"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

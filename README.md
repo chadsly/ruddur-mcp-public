@@ -1,6 +1,31 @@
 # Ruddur MCP Server
 
-Local stdio MCP server for the Ruddur creator API. It reads a scoped creator API token from `.env`, advertises explicit allowlisted tools, and forwards calls to the existing Ruddur API.
+MCP server for the Ruddur creator API. The public marketplace uses the hosted Streamable HTTP endpoint and browser OAuth; a local stdio mode remains available for development.
+
+## Marketplace installation
+
+The Codex and Claude plugin manifests connect to `https://mcp.ruddur.com/mcp`. Users do not create an environment file or paste an API token. On first use, the host discovers Ruddur's OAuth metadata, opens the Ruddur login/consent page, and stores the resulting scoped token.
+
+The service operator must deploy the included Docker image and publish `/mcp` over HTTPS. See `docs/PUBLIC_MCP_ARCHITECTURE.md`.
+
+## Protocol compatibility
+
+The HTTPS endpoint automatically supports both MCP eras:
+
+- MCP through `2025-11-25` uses the initialization-based SDK transport expected by current Codex and Claude clients.
+- MCP `2026-07-28` uses stateless per-request metadata, `server/discover`, required request headers, `resultType`, and cache metadata.
+
+The endpoint detects the era from `MCP-Protocol-Version` and `params._meta`. Both handlers use the same scoped tool runtime and forward the OAuth-issued creator API token to the existing Ruddur backend APIs.
+
+## Container publishing
+
+GitLab CI runs typechecking, tests, and compilation before Kaniko builds a `linux/amd64` image. Every branch or tag publishes:
+
+```text
+$CI_REGISTRY_IMAGE/app:$CI_COMMIT_SHORT_SHA
+```
+
+The default branch also publishes `:latest`; Git tags additionally publish an image with the same tag. GitLab's built-in `CI_JOB_TOKEN` authenticates the registry push, matching the other Ruddur service repositories.
 
 ## Setup
 
@@ -22,9 +47,9 @@ RUDDUR_CREATOR_API_TOKEN=your-token
 
 Set `RUDDUR_MCP_ALLOW_MUTATIONS=false` to run read-only. Delete, restore, publish/status, and detach operations require `confirm=true` from the calling agent.
 
-## Codex
+## Local Codex development
 
-No clone is required when installing from the public GitLab repository. Add this to `~/.codex/config.toml`:
+For local stdio development, add this to `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.ruddur]
@@ -48,9 +73,9 @@ env = { RUDDUR_MCP_ENV_FILE = "/absolute/path/to/ruddur-mcp/.env" }
 
 Restart Codex after changing MCP configuration.
 
-## Claude Code
+## Local Claude Code development
 
-No clone is required when installing from the public GitLab repository:
+For local stdio development:
 
 ```bash
 claude mcp add-json ruddur '{
@@ -71,7 +96,7 @@ Set `RUDDUR_MCP_ALLOW_MUTATIONS=false` for read-only use. Set `RUDDUR_MCP_ALLOW_
 - Keep `.env` out of source control.
 - The server never exposes a generic URL/path request tool.
 - Token management is excluded because Ruddur requires session authentication for issuing and revoking API tokens.
-- This local stdio mode may read a local `.env`. A future remote HTTP deployment should use OAuth and must not expect access to a user's local environment.
+- Only local stdio mode reads `.env`; the public remote server uses OAuth and never receives a user's local environment.
 
 ## Development
 
