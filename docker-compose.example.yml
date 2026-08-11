@@ -14,6 +14,8 @@ services:
       MCP_INTROSPECTION_SECRET: ${MCP_INTROSPECTION_SECRET:?set the same secret on the backend}
       RUDDUR_MCP_ALLOWED_ORIGINS: ${RUDDUR_MCP_ALLOWED_ORIGINS:-https://mcp.ruddur.com,https://ruddur.com,https://chatgpt.com,https://claude.ai}
       RUDDUR_MCP_TIMEOUT_MS: ${RUDDUR_MCP_TIMEOUT_MS:-30000}
+      UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-10}
+      RUDDUR_MCP_BODY_MAX_MB: ${RUDDUR_MCP_BODY_MAX_MB:-}
     depends_on:
       - backend
     networks:

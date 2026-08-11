@@ -5,6 +5,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { CREATOR_SCOPES, CreatorScope } from "./types.js";
 import { createRuddurServer } from "./server.js";
 import { handleModernRequest, isModernRequest } from "./modern.js";
+import { resolveBodyLimit } from "./body-limit.js";
 
 const port = Number(process.env.PORT || 8080);
 const apiBase = (process.env.RUDDUR_API_BASE || "https://ruddur.com").replace(/\/$/, "");
@@ -38,7 +39,7 @@ const introspect = async (token: string): Promise<Introspection> => {
 const challenge = `Bearer resource_metadata="${resourceMetadataUrl}", error="invalid_token", error_description="Sign in to Ruddur to continue"`;
 const app = express();
 app.disable("x-powered-by");
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: resolveBodyLimit() }));
 app.use((req, res, next) => {
   const origin = req.header("origin");
   if (origin && !allowedOrigins.has(origin)) return res.status(403).json({ error: "origin_not_allowed" });
