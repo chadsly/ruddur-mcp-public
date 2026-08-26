@@ -1,33 +1,60 @@
 # Connect Claude to Ruddur
 
-This guide connects Claude Code to your Ruddur creator account. Claude Code must already be installed on your computer.
+This guide connects Claude Code to your Ruddur creator account on macOS or Linux. Use the hosted marketplace installation when it is available. The local installation is retained for development and pre-deployment testing.
 
-## What You Need
+## Recommended: Hosted Marketplace Installation
+
+The hosted Ruddur plugin connects to `https://mcp.ruddur.com/mcp` and signs you in through Ruddur's browser-based authorization flow. It does not require Node.js, a local `.env` file, or a pasted API token.
+
+Add Ruddur's marketplace, install the plugin for your user account, and enable it:
+
+```bash
+claude plugin marketplace add https://gitlab.com/ruddur1/ruddur-mcp.git
+claude plugin install ruddur@ruddur-plugins --scope user
+claude plugin enable ruddur@ruddur-plugins --scope user
+```
+
+Restart Claude Code, then confirm that the plugin is installed:
+
+```bash
+claude plugin list
+```
+
+On first use, Claude opens Ruddur's browser login and consent flow. Complete that flow, then ask Claude to retrieve your Ruddur creator profile without making changes.
+
+If the hosted endpoint or marketplace installation is not yet available, use the local installation below.
+
+## Local Development Installation
+
+### What You Need
 
 - Your Ruddur Creator API token
+- Claude Code installed and signed in
 - Node.js version 20 or newer
 - About five minutes
 
 Keep your API token private. Do not paste it into a Claude conversation or share it with anyone.
 
-## 1. Check Node.js
+### 1. Check Claude Code and Node.js
 
 Open Terminal and run:
 
 ```bash
+claude --version
 node --version
+npx --version
 ```
 
-If the result starts with `v20` or a higher number, continue. If the command is not found or shows an older version, install the LTS version from [nodejs.org](https://nodejs.org/) and reopen Terminal.
+Each command should print a version. The Node.js result must start with `v20` or a higher number. If `claude` is not found, install [Claude Code](https://docs.anthropic.com/en/docs/claude-code/setup). If `node` or `npx` is not found, or Node.js is older than version 20, install the LTS version from [nodejs.org](https://nodejs.org/) and reopen Terminal.
 
-## 2. Create Your Private Ruddur Credentials File
+### 2. Create Your Private Ruddur Credentials File
 
 Run:
 
 ```bash
 mkdir -p ~/.ruddur
 chmod 700 ~/.ruddur
-vi ~/.ruddur/.env
+nano ~/.ruddur/.env
 ```
 
 Paste the following into the editor, replacing `PASTE_YOUR_TOKEN_HERE` with your Ruddur Creator API token:
@@ -50,12 +77,12 @@ Protect the file by running:
 chmod 600 ~/.ruddur/.env
 ```
 
-## 3. Connect Ruddur to Claude Code
+### 3. Connect Ruddur to Claude Code
 
 Copy and run this entire command in Terminal:
 
 ```bash
-claude mcp add-json ruddur '{
+claude mcp add-json --scope user ruddur '{
   "type": "stdio",
   "command": "npx",
   "args": ["-y", "git+https://gitlab.com/ruddur1/ruddur-mcp.git"],
@@ -65,15 +92,17 @@ claude mcp add-json ruddur '{
 }'
 ```
 
+The `--scope user` option makes Ruddur available in Claude Code from any project on this computer. The first connection may take a minute while `npx` downloads and builds the MCP server from GitLab. No repository clone is required.
+
 Confirm that Ruddur is connected:
 
 ```bash
-claude mcp list
+claude mcp get ruddur
 ```
 
-You should see `ruddur` in the list.
+You should see the `ruddur` server configuration with a connected status. You can also run `claude mcp list` to see all configured MCP servers.
 
-## 4. Run the First Tests
+### 4. Run the First Tests
 
 Start Claude Code:
 
@@ -103,14 +132,14 @@ Replace `[HEADING_ID]` with an ID from the previous response:
 
 If these tests work, Claude is connected to Ruddur in read-only mode. In read-only mode, Claude will only see tools with names like `get`, `list`, `search`, and `export`. That is expected.
 
-## 5. Allow Claude to Create and Edit Content
+### 5. Allow Claude to Create and Edit Content
 
 Only do this after the read-only tests pass.
 
 Exit Claude Code. Then run:
 
 ```bash
-vi ~/.ruddur/.env
+nano ~/.ruddur/.env
 ```
 
 Change:
@@ -154,7 +183,7 @@ Open Ruddur and review the draft. Confirm that:
 - The Heading is private and has not been published.
 - The five Waypoints appear in the correct order.
 - Each Waypoint has a useful description.
-- Each Waypoint includes its creator assessment configuration.
+- The ordinary Waypoints do not include a creator assessment configuration.
 
 You can keep and improve this draft. To practice a safe destructive action instead, ask Claude:
 
@@ -166,7 +195,17 @@ Claude should ask for confirmation before deleting it.
 
 ### Ruddur does not appear in `claude mcp list`
 
-Run the connection command in Step 3 again. Then fully exit and restart Claude Code.
+Run `claude mcp get ruddur` to check its configuration. If it does not exist, run the connection command in Step 3 again. Then fully exit and restart Claude Code.
+
+### Ruddur is configured but fails to connect
+
+Run `claude mcp get ruddur` and review the reported error. Confirm that GitLab is reachable from your network and that `npx --version` succeeds. The first launch requires network access so `npx` can download the MCP server and its dependencies.
+
+If Claude reports that a server named `ruddur` already exists and you intentionally want to replace its configuration, remove it and then repeat Step 3:
+
+```bash
+claude mcp remove --scope user ruddur
+```
 
 ### `node` or `npx` is not found
 
