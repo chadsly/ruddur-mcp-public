@@ -225,6 +225,26 @@ const normalizeCouponBody = (operation: Operation, body: unknown): unknown => {
   return result;
 };
 
+const normalizePromotionBody = (body: unknown): unknown => {
+  if (!isRecord(body)) return body;
+  const result: Record<string, unknown> = { ...body };
+  copyAlias(result, "code", ["couponCode", "promoCode"]);
+  copyAlias(result, "offeringIds", ["skuIds", "skus", "offeringSkus", "products"]);
+  copyAlias(result, "startsAt", ["starts", "startDate"]);
+  copyAlias(result, "expiresAt", ["expires", "expiration", "expirationDate", "endDate"]);
+  copyAlias(result, "maxRedemptions", ["redemptionLimit", "usageLimit", "maxUses"]);
+  copyAlias(result, "maxRedemptionsPerCustomer", ["perCustomerLimit", "usesPerCustomer"]);
+  copyAlias(result, "minimumPurchaseAmount", ["minimumPurchase", "minimumSpend"]);
+  const percent = firstPresent(result, ["percentOff", "percentageOff", "discountPercent"]);
+  const amount = firstPresent(result, ["amountOff", "discountAmount"]);
+  if (percent !== undefined) { result.discountType = "PERCENTAGE"; result.discountValue = percent; }
+  else if (amount !== undefined) { result.discountType = "FIXED_AMOUNT"; result.discountValue = amount; }
+  if (result.scope === undefined) result.scope = Array.isArray(result.offeringIds) && result.offeringIds.length ? "SPECIFIC_OFFERINGS" : "ALL_CREATOR_OFFERINGS";
+  result.discountType = upperString(result.discountType ?? "PERCENTAGE");
+  result.scope = upperString(result.scope);
+  return result;
+};
+
 const normalizeMarketplaceListingBody = (operation: Operation, body: unknown): unknown => {
   if (!isRecord(body)) return body;
   const marketplace = isRecord(body.marketplace) ? body.marketplace : {};
@@ -300,6 +320,7 @@ const normalizeOperationBody = (operation: Operation, body: unknown): unknown =>
   if (operation.name === "ruddur_attach_waypoint" || operation.name === "ruddur_update_waypoint_placement") return normalizeWaypointPlacementBody(body);
   if (operation.name.startsWith("ruddur_create_media") || operation.name.startsWith("ruddur_update_media") || MEDIA_LINK_OPERATIONS.has(operation.name)) return normalizeMediaBody(operation, body);
   if (operation.name === "ruddur_create_coupon" || operation.name === "ruddur_update_coupon") return normalizeCouponBody(operation, body);
+  if (operation.name === "ruddur_create_promotion") return normalizePromotionBody(body);
   if (MARKETPLACE_LISTING_OPERATIONS.has(operation.name)) return normalizeMarketplaceListingBody(operation, body);
   if (COLLABORATOR_OPERATIONS.has(operation.name)) return normalizeCollaboratorBody(operation, body);
   if (operation.name === "ruddur_update_creator_profile") return normalizeCreatorProfileBody(body);

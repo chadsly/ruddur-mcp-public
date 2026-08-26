@@ -280,6 +280,23 @@ test("normalizes coupon aliases", () => {
   });
 });
 
+test("normalizes SKU-scoped promotion aliases", () => {
+  const operation = operationByName.get("ruddur_create_promotion");
+  assert.ok(operation);
+  const args = normalizeToolArguments(operation, {
+    promoCode: "launch25", percentOff: 25, skus: ["HDG-LAUNCH-1234"],
+    starts: "2026-09-01T00:00:00Z", expires: "2026-09-30T00:00:00Z",
+    usageLimit: 100, perCustomerLimit: 1, minimumSpend: 500,
+  });
+  assert.deepEqual(args.body, {
+    promoCode: "launch25", percentOff: 25, skus: ["HDG-LAUNCH-1234"], starts: "2026-09-01T00:00:00Z",
+    expires: "2026-09-30T00:00:00Z", usageLimit: 100, perCustomerLimit: 1, minimumSpend: 500,
+    code: "launch25", offeringIds: ["HDG-LAUNCH-1234"], startsAt: "2026-09-01T00:00:00Z",
+    expiresAt: "2026-09-30T00:00:00Z", maxRedemptions: 100, maxRedemptionsPerCustomer: 1,
+    minimumPurchaseAmount: 500, discountType: "PERCENTAGE", discountValue: 25, scope: "SPECIFIC_OFFERINGS",
+  });
+});
+
 test("normalizes waypoint placement aliases", () => {
   const operation = operationByName.get("ruddur_attach_waypoint");
   assert.ok(operation);

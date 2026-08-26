@@ -68,6 +68,10 @@ export const OPERATIONS: Operation[] = [
   op("ruddur_list_coupons", "List creator marketplace coupons.", "GET", "/api/marketplace/coupons", any("marketplace.read", "marketplace.manage")),
   op("ruddur_create_coupon", "Create a marketplace coupon.", "POST", "/api/marketplace/coupons", one("marketplace.manage"), { mutation: true }),
   op("ruddur_update_coupon", "Update a marketplace coupon.", "PATCH", "/api/marketplace/coupons/:couponId", one("marketplace.manage"), { mutation: true }),
+  op("ruddur_list_commerce_offerings", "List creator-owned commerce Offerings with their Ruddur SKUs for promotion targeting.", "GET", "/api/commerce/offerings/mine", any("marketplace.read", "marketplace.manage")),
+  op("ruddur_list_promotions", "List creator promotion codes, scopes, schedules, and redemption limits.", "GET", "/api/commerce/promotions", any("marketplace.read", "marketplace.manage")),
+  op("ruddur_create_promotion", "Create a creator promotion for all Offerings or selected Offering IDs/SKUs, with optional dates and redemption limits.", "POST", "/api/commerce/promotions", one("marketplace.manage"), { mutation: true }),
+  op("ruddur_disable_promotion", "Disable a creator promotion code.", "DELETE", "/api/commerce/promotions/:couponId", one("marketplace.manage"), { mutation: true, confirmationRequired: true }),
   op("ruddur_verify_entitlement", "Verify a user's entitlement to a creator listing.", "POST", "/api/marketplace/entitlements/verify", any("marketplace.entitlements", "marketplace.manage")),
   op("ruddur_get_marketplace_license", "Get creator license details for a purchase.", "GET", "/api/marketplace/licenses/:purchaseId", any("marketplace.entitlements", "marketplace.manage")),
 ];

@@ -15,6 +15,13 @@ test("mutation filtering removes write tools", () => {
   assert.ok(operations.some((operation) => operation.name === "ruddur_get_creator_billing"));
 });
 
+test("commerce promotion tools are scoped and require confirmation to disable", () => {
+  const operations = visibleOperations(new Set(["marketplace.manage"]), true);
+  assert.ok(operations.some(operation => operation.name === "ruddur_list_commerce_offerings"));
+  assert.ok(operations.some(operation => operation.name === "ruddur_create_promotion"));
+  assert.equal(operationByName.get("ruddur_disable_promotion")?.confirmationRequired, true);
+});
+
 test("path parameters are encoded and required", () => {
   const operation = operationByName.get("ruddur_get_heading");
   assert.ok(operation);

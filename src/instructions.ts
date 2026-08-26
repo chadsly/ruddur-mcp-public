@@ -29,6 +29,9 @@ export const operationGuidance = (operationName: string) => {
   if (["ruddur_create_coupon", "ruddur_update_coupon"].includes(operationName)) {
     return " The MCP server accepts coupon aliases such as promoCode, percentOff, amountOff, expires, usageLimit, and marketplaceListingId.";
   }
+  if (operationName === "ruddur_create_promotion") {
+    return " Use ruddur_list_commerce_offerings to resolve creator-owned Offering IDs and SKUs. Promotions accept promoCode, percentOff or amountOff, offeringIds/SKUs, starts/expires, total usageLimit, perCustomerLimit, and minimumPurchaseAmount. Monetary amounts use integer USD cents after normalization.";
+  }
   if (["ruddur_add_heading_collaborator", "ruddur_update_heading_collaborator"].includes(operationName)) {
     return " The MCP server accepts collaborator aliases such as userId, collaboratorId, permission, access, and accessLevel.";
   }
