@@ -53,3 +53,15 @@ test("tool descriptions include MCP normalization guidance", () => {
   assert.match(tool.description, /unless explicitly requested or specifically required/);
   assert.match(JSON.stringify(tool.inputSchema), /omit assessmentConfig/);
 });
+
+test("assessment waypoint tools require persisted read-after-write verification", () => {
+  const operation = operationByName.get("ruddur_create_waypoint");
+  assert.ok(operation);
+
+  const tool = toolForOperation(operation);
+
+  assert.match(tool.description, /unique non-empty id/);
+  assert.match(tool.description, /unique non-empty string label and value/);
+  assert.match(tool.description, /ruddur_list_waypoints/);
+  assert.match(tool.description, /before reporting success/);
+});
