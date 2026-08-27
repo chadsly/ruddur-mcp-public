@@ -64,4 +64,7 @@ test("assessment waypoint tools require persisted read-after-write verification"
   assert.match(tool.description, /unique non-empty string label and value/);
   assert.match(tool.description, /ruddur_list_waypoints/);
   assert.match(tool.description, /before reporting success/);
+  assert.match(tool.description, /complete config and questions atomically/);
+  assert.match(tool.description, /Option scores are optional/);
+  assert.match(tool.description, /scoring\.dimensions is accepted as an alias/);
 });
