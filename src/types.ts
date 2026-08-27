@@ -1,17 +1,34 @@
 export const CREATOR_SCOPES = [
-  "content.read",
-  "content.manage",
+  "headings.read",
+  "headings.manage",
+  "waypoints.read",
+  "waypoints.manage",
+  "collaborators.read",
+  "collaborators.manage",
   "media.read",
   "media.manage",
-  "marketplace.read",
-  "marketplace.manage",
-  "marketplace.entitlements",
+  "profile.read",
+  "profile.manage",
+  "listings.read",
+  "listings.manage",
+  "offerings.read",
+  "offerings.manage",
+  "promotions.read",
+  "promotions.manage",
+  "entitlements.read",
+  "licenses.read",
   "analytics.read",
   "events.write",
   "billing.read",
 ] as const;
 
-export type CreatorScope = (typeof CREATOR_SCOPES)[number];
+export const LEGACY_CREATOR_SCOPES = [
+  "content.read", "content.manage", "marketplace.read", "marketplace.manage", "marketplace.entitlements",
+] as const;
+
+export const SUPPORTED_CREATOR_SCOPES = [...CREATOR_SCOPES, ...LEGACY_CREATOR_SCOPES] as const;
+
+export type CreatorScope = (typeof SUPPORTED_CREATOR_SCOPES)[number];
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export type ScopeRequirement = {

@@ -2,7 +2,7 @@
 
 import express, { Request, Response } from "express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { CREATOR_SCOPES, CreatorScope } from "./types.js";
+import { CREATOR_SCOPES, SUPPORTED_CREATOR_SCOPES, CreatorScope } from "./types.js";
 import { createRuddurServer } from "./server.js";
 import { handleModernRequest, isModernRequest } from "./modern.js";
 import { resolveBodyLimit } from "./body-limit.js";
@@ -68,7 +68,7 @@ const handleMcp = async (req: Request, res: Response) => {
     res.setHeader("WWW-Authenticate", challenge);
     return res.status(401).json({ error: "invalid_token" });
   }
-  const validScopes = new Set<string>(CREATOR_SCOPES);
+  const validScopes = new Set<string>(SUPPORTED_CREATOR_SCOPES);
   const scopes = new Set<CreatorScope>(
     (auth.scope || "").split(/\s+/).filter((scope: string): scope is CreatorScope => validScopes.has(scope)),
   );

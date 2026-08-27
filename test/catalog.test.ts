@@ -22,6 +22,18 @@ test("commerce promotion tools are scoped and require confirmation to disable", 
   assert.equal(operationByName.get("ruddur_disable_promotion")?.confirmationRequired, true);
 });
 
+test("granular marketplace scopes do not leak unrelated management tools", () => {
+  const listingTools = visibleOperations(new Set(["listings.manage"]), true);
+  assert.ok(listingTools.some(operation => operation.name === "ruddur_create_marketplace_listing"));
+  assert.ok(listingTools.some(operation => operation.name === "ruddur_list_my_marketplace_listings"));
+  assert.ok(!listingTools.some(operation => operation.name === "ruddur_create_promotion"));
+  assert.ok(!listingTools.some(operation => operation.name === "ruddur_update_creator_profile"));
+
+  const promotionTools = visibleOperations(new Set(["promotions.manage"]), true);
+  assert.ok(promotionTools.some(operation => operation.name === "ruddur_create_promotion"));
+  assert.ok(!promotionTools.some(operation => operation.name === "ruddur_create_marketplace_listing"));
+});
+
 test("path parameters are encoded and required", () => {
   const operation = operationByName.get("ruddur_get_heading");
   assert.ok(operation);

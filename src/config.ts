@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import dotenv from "dotenv";
-import { CREATOR_SCOPES, type CreatorScope } from "./types.js";
+import { SUPPORTED_CREATOR_SCOPES, type CreatorScope } from "./types.js";
 
 export type RuddurMcpConfig = {
   apiBase: string;
@@ -25,7 +25,7 @@ export const loadDotEnv = () => {
 
 const parseScopes = (value: string | undefined): Set<CreatorScope> | null => {
   if (!value?.trim()) return null;
-  const valid = new Set<string>(CREATOR_SCOPES);
+  const valid = new Set<string>(SUPPORTED_CREATOR_SCOPES);
   const scopes = value
     .split(/[\s,]+/)
     .map((scope) => scope.trim())
