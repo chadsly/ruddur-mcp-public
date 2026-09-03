@@ -34,6 +34,21 @@ test("granular marketplace scopes do not leak unrelated management tools", () =>
   assert.ok(!promotionTools.some(operation => operation.name === "ruddur_create_marketplace_listing"));
 });
 
+test("coaching provider and paid offerings require independent granular grants", () => {
+  const providerTools = visibleOperations(new Set(["coaching.provider.manage"]), true);
+  assert.ok(providerTools.some(operation => operation.name === "ruddur_get_coaching_provider"));
+  assert.ok(providerTools.some(operation => operation.name === "ruddur_update_coaching_provider"));
+  assert.ok(!providerTools.some(operation => operation.name === "ruddur_list_coaching_offerings"));
+  assert.ok(!providerTools.some(operation => operation.name === "ruddur_create_coaching_offering"));
+
+  const offeringTools = visibleOperations(new Set(["coaching.offerings.manage"]), true);
+  assert.ok(offeringTools.some(operation => operation.name === "ruddur_list_coaching_offerings"));
+  assert.ok(offeringTools.some(operation => operation.name === "ruddur_create_coaching_offering"));
+  assert.ok(offeringTools.some(operation => operation.name === "ruddur_update_coaching_offering"));
+  assert.ok(!offeringTools.some(operation => operation.name === "ruddur_get_coaching_provider"));
+  assert.equal(operationByName.get("ruddur_update_coaching_offering")?.confirmationRequired, true);
+});
+
 test("path parameters are encoded and required", () => {
   const operation = operationByName.get("ruddur_get_heading");
   assert.ok(operation);

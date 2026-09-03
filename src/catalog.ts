@@ -59,6 +59,15 @@ export const OPERATIONS: Operation[] = [
   op("ruddur_get_creator_analytics", "Get creator analytics summary.", "GET", "/api/creator/analytics/summary", one("analytics.read")),
   op("ruddur_get_creator_billing", "Get creator billing summary.", "GET", "/api/creator/billing", one("billing.read")),
 
+  // Coaching capability is a provider feature on a creator account, rather
+  // than a separate account type. Keep these scopes intentionally narrow:
+  // provider profile and paid offerings are independent grants.
+  op("ruddur_get_coaching_provider", "Get the authenticated creator's coaching-provider profile and payout readiness.", "GET", "/api/coaching/provider/me", one("coaching.provider.read")),
+  op("ruddur_update_coaching_provider", "Enable or update the authenticated creator's coaching-provider profile, public bio, and booking settings.", "PUT", "/api/coaching/provider/me", one("coaching.provider.manage"), { mutation: true, confirmationRequired: true }),
+  op("ruddur_list_coaching_offerings", "List the authenticated coach's session and package offerings, including draft and archived offerings.", "GET", "/api/commerce/coaching/creator/offerings", one("coaching.offerings.read")),
+  op("ruddur_create_coaching_offering", "Create a draft coaching session or package offering. Publishing a paid offering requires completed payout setup.", "POST", "/api/commerce/coaching/creator/offerings", one("coaching.offerings.manage"), { mutation: true }),
+  op("ruddur_update_coaching_offering", "Update a coach-owned session or package offering, including price, availability, description, duration, session count, expiration, or status.", "PATCH", "/api/commerce/coaching/creator/offerings/:offeringId", one("coaching.offerings.manage"), { mutation: true, confirmationRequired: true }),
+
   op("ruddur_list_my_marketplace_listings", "List marketplace listings owned by the creator.", "GET", "/api/marketplace/listings/mine", any("listings.read", "listings.manage")),
   op("ruddur_create_marketplace_listing", "Create a marketplace listing.", "POST", "/api/marketplace/listings", one("listings.manage"), { mutation: true }),
   op("ruddur_update_marketplace_listing", "Update or publish a marketplace listing.", "PUT", "/api/marketplace/listings/:id", one("listings.manage"), { mutation: true, confirmationRequired: true }),
@@ -92,6 +101,8 @@ const impliedScopes: Partial<Record<CreatorScope, CreatorScope[]>> = {
   "marketplace.read": ["profile.read", "listings.read", "offerings.read", "promotions.read"],
   "marketplace.manage": ["profile.read", "profile.manage", "listings.read", "listings.manage", "offerings.read", "offerings.manage", "promotions.read", "promotions.manage", "entitlements.read", "licenses.read"],
   "marketplace.entitlements": ["entitlements.read", "licenses.read"],
+  "coaching.provider.manage": ["coaching.provider.read"],
+  "coaching.offerings.manage": ["coaching.offerings.read"],
 };
 
 const configuredScopeSatisfies = (configuredScopes: Set<CreatorScope>, required: CreatorScope) =>

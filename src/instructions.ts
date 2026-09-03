@@ -7,6 +7,7 @@ export const RUDDUR_MCP_INSTRUCTIONS = [
   "For marketplace publishing, prefer ruddur_create_marketplace_listing with either an existing headingId or a natural payload containing marketplace details and waypoints. Keep status as DRAFT unless the user explicitly asks to publish.",
   "Write marketplace descriptions as buyer-facing copy that leads with the problem solved, expected outcome, and practical value. Do not add implementation details about question format, free-text fields, PII or data-handling mechanics, or generic educational and non-diagnostic disclaimers unless the user explicitly requests them or a specific legal or product requirement requires them.",
   "Sensitive or destructive tools require confirm=true only after explicit user confirmation.",
+  "Coaching is a provider capability on a creator account. Keep a coaching offering DRAFT unless the user explicitly asks to publish it. Before publishing a paid offering, use ruddur_get_coaching_provider to confirm payout readiness. Do not use generic Offering tools to manage coaching sessions or packages; use the coaching-provider and coaching-offering tools, which require separate granular grants. Heading-specific coaching grants are managed through the coaching API and are intentionally not inferred from a provider or offering permission.",
 ].join(" ");
 
 export const BODY_SCHEMA_DESCRIPTION = [
@@ -45,6 +46,12 @@ export const operationGuidance = (operationName: string) => {
   }
   if (operationName === "ruddur_verify_entitlement") {
     return " The MCP server accepts marketplaceListingId and customerUserId aliases.";
+  }
+  if (operationName === "ruddur_update_coaching_provider") {
+    return " This changes the authenticated creator's coaching capability and public booking presence. Require the user's explicit confirmation before submitting it. Do not include client data or secrets in the provider profile.";
+  }
+  if (["ruddur_create_coaching_offering", "ruddur_update_coaching_offering"].includes(operationName)) {
+    return " Use offeringType COACHING_SESSION for exactly one session, or COACHING_PACKAGE for a multi-session package. Prices are integer USD cents. Create as DRAFT unless the user explicitly asks to publish; paid publishing requires payout readiness. Updating price or published/archived status changes what clients can buy, so obtain explicit confirmation before a sensitive update.";
   }
   return "";
 };

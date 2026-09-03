@@ -20,6 +20,13 @@ export const CREATOR_SCOPES = [
   "analytics.read",
   "events.write",
   "billing.read",
+  // Coaching is deliberately separate from the broad marketplace scopes. A
+  // connection that can curate Headings or generic listings must not gain
+  // access to a coach's practice, clients, or paid session catalog.
+  "coaching.provider.read",
+  "coaching.provider.manage",
+  "coaching.offerings.read",
+  "coaching.offerings.manage",
 ] as const;
 
 export const LEGACY_CREATOR_SCOPES = [
