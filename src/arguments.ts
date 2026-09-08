@@ -123,10 +123,8 @@ const withCreatorAssessmentConfig = (waypoint: unknown) => {
     return waypoint;
   }
   if (isRecord(waypoint.creatorAssessmentConfig) && Object.keys(waypoint.creatorAssessmentConfig).length > 0) {
-    return {
-      ...waypoint,
-      assessmentConfig: waypoint.creatorAssessmentConfig,
-    };
+    const { creatorAssessmentConfig, ...rest } = waypoint;
+    return { ...rest, assessmentConfig: creatorAssessmentConfig };
   }
   return waypoint;
 };

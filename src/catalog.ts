@@ -40,6 +40,9 @@ export const OPERATIONS: Operation[] = [
   op("ruddur_update_heading_status", "Update a Heading lifecycle status.", "PATCH", "/api/creator/headings/:id/status", one("headings.manage"), { mutation: true, confirmationRequired: true }),
 
   op("ruddur_list_waypoints", "List creator-owned Waypoints.", "GET", "/api/creator/waypoints", one("waypoints.read")),
+  op("ruddur_get_waypoint", "Retrieve one creator-owned Waypoint by id before editing it. Returns the complete current fields; never send this object back unchanged.", "GET", "/api/creator/waypoints/:id", one("waypoints.read")),
+  op("ruddur_review_assessment", "Review a creator assessment's persisted draft, last published snapshot, relationships, validation, publication blockers, and safe next calls. Does not expose learner answers.", "GET", "/api/creator/waypoints/:id/assessment", one("waypoints.read")),
+  op("ruddur_preview_assessment", "Score representative answers against a persisted assessment draft or published snapshot without creating a learner submission, completion, analytics event, or saved result.", "POST", "/api/creator/waypoints/:id/assessment/preview", one("waypoints.read")),
   op("ruddur_create_waypoint", "Create a creator-owned Waypoint.", "POST", "/api/creator/waypoints", one("waypoints.manage"), { mutation: true }),
   op("ruddur_update_waypoint", "Update a creator-owned Waypoint.", "PUT", "/api/creator/waypoints/:id", one("waypoints.manage"), { mutation: true }),
   op("ruddur_delete_waypoint", "Delete a creator-owned Waypoint.", "DELETE", "/api/creator/waypoints/:id", one("waypoints.manage"), { mutation: true, destructive: true, confirmationRequired: true }),

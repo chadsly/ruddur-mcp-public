@@ -72,7 +72,7 @@ test("returns scoped tools with modern cache and result metadata", async () => {
   assert.equal(body.result.resultType, "complete");
   assert.equal(body.result.cacheScope, "private");
   assert.ok(body.result.tools.length > 0);
-  assert.ok(body.result.tools.every((tool: any) => tool.name.includes("heading") || tool.name.includes("waypoint")));
+  assert.ok(body.result.tools.every((tool: any) => tool.name.includes("heading") || tool.name.includes("waypoint") || tool.name.includes("assessment")));
   assert.equal(body.result._meta["io.modelcontextprotocol/serverInfo"].name, "ruddur-mcp");
 });
 

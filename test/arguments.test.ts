@@ -154,7 +154,6 @@ test("maps creatorAssessmentConfig alias to assessmentConfig", () => {
 
   assert.deepEqual(args.body, {
     title: "Assess Your Money Mindset",
-    creatorAssessmentConfig: existingConfig,
     assessmentConfig: existingConfig,
   });
 });
