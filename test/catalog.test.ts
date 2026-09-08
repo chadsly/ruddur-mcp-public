@@ -49,6 +49,17 @@ test("coaching provider and paid offerings require independent granular grants",
   assert.equal(operationByName.get("ruddur_update_coaching_offering")?.confirmationRequired, true);
 });
 
+test("client coaching tools are isolated and mutations require confirmation", () => {
+  const readTools = visibleOperations(new Set(["coaching.client.read"]), true);
+  assert.ok(readTools.some(operation => operation.name === "ruddur_search_client_coaches"));
+  assert.ok(readTools.some(operation => operation.name === "ruddur_get_client_coaching_meeting"));
+  assert.ok(!readTools.some(operation => operation.name === "ruddur_book_client_coaching_session"));
+  const manageTools = visibleOperations(new Set(["coaching.client.manage"]), true);
+  assert.equal(operationByName.get("ruddur_book_client_coaching_session")?.confirmationRequired, true);
+  assert.equal(operationByName.get("ruddur_share_client_coaching_result")?.confirmationRequired, true);
+  assert.ok(manageTools.some(operation => operation.name === "ruddur_complete_client_coaching_requirement"));
+});
+
 test("path parameters are encoded and required", () => {
   const operation = operationByName.get("ruddur_get_heading");
   assert.ok(operation);
