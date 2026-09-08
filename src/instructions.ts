@@ -12,6 +12,7 @@ export const RUDDUR_MCP_INSTRUCTIONS = [
   "Write marketplace descriptions as buyer-facing copy that leads with the problem solved, expected outcome, and practical value. Do not add implementation details about question format, free-text fields, PII or data-handling mechanics, or generic educational and non-diagnostic disclaimers unless the user explicitly requests them or a specific legal or product requirement requires them.",
   "Sensitive or destructive tools require confirm=true only after explicit user confirmation.",
   "Coaching is a provider capability on a creator account. Keep a coaching offering DRAFT unless the user explicitly asks to publish it. Before publishing a paid offering, use ruddur_get_coaching_provider to confirm payout readiness. Do not use generic Offering tools to manage coaching sessions or packages; use the coaching-provider and coaching-offering tools, which require separate granular grants. Heading-specific coaching grants are managed through the coaching API and are intentionally not inferred from a provider or offering permission.",
+  "Coaching availability uses ruddur_get_coaching_availability and ruddur_update_coaching_availability. Send weeklySchedule entries with day MONDAY through SUNDAY, available boolean, and HH:MM 24-hour startTime/endTime for available days; blocked days can omit times. Verify updates with a follow-up get.",
 ].join(" ");
 
 export const BODY_SCHEMA_DESCRIPTION = [
@@ -59,5 +60,6 @@ export const operationGuidance = (operationName: string) => {
   if (["ruddur_create_coaching_offering", "ruddur_update_coaching_offering"].includes(operationName)) {
     return " Use offeringType COACHING_SESSION for exactly one session, or COACHING_PACKAGE for a multi-session package. Prices are integer USD cents. Create as DRAFT unless the user explicitly asks to publish; paid publishing requires payout readiness. Updating price or published/archived status changes what clients can buy, so obtain explicit confirmation before a sensitive update.";
   }
+  if (operationName === "ruddur_update_coaching_availability") return " Send a complete weeklySchedule using MONDAY through SUNDAY and HH:MM 24-hour times. Set available:false for blocked days. Include timezone when changing it, and read the schedule back after updating.";
   return "";
 };

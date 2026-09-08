@@ -37,6 +37,7 @@ build-kaniko:
         --context "${CI_PROJECT_DIR}" \
         --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
         --custom-platform linux/amd64 \
+        --push-retry "3" \
         --destination "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}" \
         $EXTRA_DEST
   rules:
