@@ -27,6 +27,8 @@ export const CREATOR_SCOPES = [
   "coaching.provider.manage",
   "coaching.offerings.read",
   "coaching.offerings.manage",
+  "coaching.client.read",
+  "coaching.client.manage",
 ] as const;
 
 export const LEGACY_CREATOR_SCOPES = [

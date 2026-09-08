@@ -61,5 +61,8 @@ export const operationGuidance = (operationName: string) => {
     return " Use offeringType COACHING_SESSION for exactly one session, or COACHING_PACKAGE for a multi-session package. Prices are integer USD cents. Create as DRAFT unless the user explicitly asks to publish; paid publishing requires payout readiness. Updating price or published/archived status changes what clients can buy, so obtain explicit confirmation before a sensitive update.";
   }
   if (operationName === "ruddur_update_coaching_availability") return " Send a complete weeklySchedule using MONDAY through SUNDAY and HH:MM 24-hour times. Set available:false for blocked days. Include timezone when changing it, and read the schedule back after updating.";
+  if (operationName === "ruddur_create_coaching_appointment_type") return " Use a separate appointment type for each duration (for example 30, 60, or 90 minutes). Availability rules may contain multiple intervals for the same weekday. Keep durations aligned with linked coaching offerings.";
+  if (operationName === "ruddur_replace_coaching_appointment_availability") return " Send body { rules: [{ dayOfWeek: 1, startTimeLocal: '09:00', endTimeLocal: '12:00' }, { dayOfWeek: 1, startTimeLocal: '13:00', endTimeLocal: '17:00' }] } to represent split intervals; use dayOfWeek 0 for Sunday.";
+  if (operationName === "ruddur_preview_coaching_slots") return " Supply query date=YYYY-MM-DD. This is read-only and returns the appointment type plus generated slots after buffers, notice windows, recurring rules, date overrides, bookings, and calendar conflicts.";
   return "";
 };
