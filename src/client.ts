@@ -14,6 +14,25 @@ export class RuddurApiError extends Error {
 
 type Fetch = typeof globalThis.fetch;
 
+// Upstream proxies and unhandled backend errors may return HTML or diagnostic
+// objects. Never forward those internals to an agent as a tool result.
+const safeErrorBody = (status: number, body: unknown) => {
+  if (status >= 500) {
+    return { code: "UPSTREAM_ERROR", error: "Ruddur could not complete the request. Please try again later." };
+  }
+  if (body && typeof body === "object" && !Array.isArray(body)) {
+    const source = body as Record<string, unknown>;
+    const code = typeof source.code === "string" && /^[A-Za-z0-9_:-]{1,100}$/.test(source.code)
+      ? source.code : "API_ERROR";
+    const message = typeof source.error === "string" ? source.error : source.message;
+    if (typeof message === "string" && message.length <= 1000 && !/[<>]/.test(message)) {
+      return { code, error: message };
+    }
+    return { code, error: "Ruddur rejected the request." };
+  }
+  return { code: "API_ERROR", error: "Ruddur rejected the request." };
+};
+
 const appendQuery = (url: URL, query: ToolArguments["query"]) => {
   for (const [key, rawValue] of Object.entries(query || {})) {
     if (rawValue == null) continue;
@@ -67,7 +86,7 @@ export class RuddurClient {
       });
       const body = await parseResponse(response);
       if (!response.ok) {
-        throw new RuddurApiError(`Ruddur API returned ${response.status} for ${operation.name}.`, response.status, body);
+        throw new RuddurApiError(`Ruddur API returned ${response.status} for ${operation.name}.`, response.status, safeErrorBody(response.status, body));
       }
       return { status: response.status, body };
     } finally {
