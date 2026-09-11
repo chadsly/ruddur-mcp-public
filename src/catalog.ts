@@ -13,7 +13,8 @@ const op = (
 ): Operation => ({ name, description, method, path, scope, ...flags });
 
 export const OPERATIONS: Operation[] = [
-  op("ruddur_list_headings", "List creator-owned Headings.", "GET", "/api/creator/headings", one("headings.read")),
+  op("ruddur_list_headings", "List the authenticated user's Headings and progress.", "GET", "/api/creator/headings", one("headings.read")),
+  op("ruddur_search_marketplace_headings", "Search published marketplace Headings by goal, tag, creator, or price.", "GET", "/api/marketplace/listings", one("marketplace.read")),
   op("ruddur_create_heading", "Create or import a creator-owned Heading.", "POST", "/api/creator/headings", one("headings.manage"), { mutation: true }),
   op("ruddur_get_heading", "Get a creator-owned Heading by id.", "GET", "/api/creator/headings/:id", one("headings.read")),
   op("ruddur_update_heading", "Update a Heading, cover asset, or canvas style.", "PUT", "/api/creator/headings/:id", one("headings.manage"), { mutation: true }),
