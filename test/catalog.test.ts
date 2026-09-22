@@ -60,6 +60,20 @@ test("client coaching tools are isolated and mutations require confirmation", ()
   assert.ok(manageTools.some(operation => operation.name === "ruddur_complete_client_coaching_requirement"));
 });
 
+test("relationship tools expose assignment pointers and results under an isolated read scope", () => {
+  const tools = visibleOperations(new Set(["relationships.read"]), true);
+  assert.deepEqual(
+    tools.map(operation => operation.name),
+    ["ruddur_list_relationships", "ruddur_list_coaching_clients", "ruddur_get_assigned_heading_results"],
+  );
+  assert.equal(
+    buildPath(operationByName.get("ruddur_get_assigned_heading_results")!, { pathParams: { id: "assignment/one" } }),
+    "/api/delegations/assignments/assignment%2Fone/inputs",
+  );
+  assert.match(operationByName.get("ruddur_list_relationships")!.description, /every type/);
+  assert.match(operationByName.get("ruddur_get_assigned_heading_results")!.description, /unrelated Headings/);
+});
+
 test("path parameters are encoded and required", () => {
   const operation = operationByName.get("ruddur_get_heading");
   assert.ok(operation);
