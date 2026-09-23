@@ -8,6 +8,8 @@ The Codex and Claude plugin manifests connect to `https://mcp.ruddur.com/mcp`. U
 
 The service operator must deploy the included Docker image and publish `/mcp` over HTTPS. See `docs/PUBLIC_MCP_ARCHITECTURE.md`.
 
+Coaches can grant `relationships.assign` separately from `relationships.read`. With that write grant, `ruddur_assign_heading` takes the `relationshipId` from `ruddur_list_coaching_clients` and a creator-owned `headingId` from Heading search/list tools. The API derives the client from the active coaching relationship, copies the Heading and Waypoints through the same application workflow as the web UI, and returns the existing assignment on retry. Grant `relationships.read` as well to verify the assignment through the coaching roster and assigned-results tools. Existing read-only tokens cannot assign Headings; reconnect and approve the new grant to make the tool available.
+
 ## Protocol compatibility
 
 The HTTPS endpoint automatically supports both MCP eras:

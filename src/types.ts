@@ -30,6 +30,7 @@ export const CREATOR_SCOPES = [
   "coaching.client.read",
   "coaching.client.manage",
   "relationships.read",
+  "relationships.assign",
 ] as const;
 
 export const LEGACY_CREATOR_SCOPES = [

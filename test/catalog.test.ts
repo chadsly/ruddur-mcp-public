@@ -74,6 +74,19 @@ test("relationship tools expose assignment pointers and results under an isolate
   assert.match(operationByName.get("ruddur_get_assigned_heading_results")!.description, /unrelated Headings/);
 });
 
+test("coaching assignment is a separate write grant without changing read-only access", () => {
+  const readOnly = visibleOperations(new Set(["relationships.read"]), true);
+  assert.ok(!readOnly.some(operation => operation.name === "ruddur_assign_heading"));
+  const writeOnly = visibleOperations(new Set(["relationships.assign"]), true);
+  assert.deepEqual(writeOnly.map(operation => operation.name), ["ruddur_assign_heading"]);
+  assert.ok(!visibleOperations(new Set(["relationships.assign"]), false).some(operation => operation.name === "ruddur_assign_heading"));
+  const operation = operationByName.get("ruddur_assign_heading")!;
+  assert.equal(buildPath(operation, { pathParams: { relationshipId: "relationship-id" } }), "/api/delegations/coaching-clients/relationship-id/assignments");
+  assert.deepEqual(toolForOperation(operation).inputSchema.required, ["relationshipId", "headingId"]);
+  assert.equal(toolForOperation(operation).annotations.readOnlyHint, false);
+  assert.match(operation.description, /ruddur_list_coaching_clients/);
+});
+
 test("path parameters are encoded and required", () => {
   const operation = operationByName.get("ruddur_get_heading");
   assert.ok(operation);

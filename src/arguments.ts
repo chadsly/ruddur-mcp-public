@@ -328,6 +328,15 @@ const normalizeOperationBody = (operation: Operation, body: unknown): unknown =>
 };
 
 export const normalizeToolArguments = (operation: Operation, rawArguments: Record<string, unknown>): ToolArguments => {
+  if (operation.name === "ruddur_assign_heading") {
+    const relationshipId = rawArguments.relationshipId;
+    const headingId = rawArguments.headingId;
+    if (typeof relationshipId !== "string" || !relationshipId.trim() || typeof headingId !== "string" || !headingId.trim()) {
+      throw new Error("relationshipId and headingId are required.");
+    }
+    if (rawArguments.message !== undefined && typeof rawArguments.message !== "string") throw new Error("message must be a string.");
+    return { pathParams: { relationshipId: relationshipId.trim() }, body: { headingId: headingId.trim(), ...(rawArguments.message ? { message: rawArguments.message } : {}) } };
+  }
   const args = { ...rawArguments } as ToolArguments;
   const canSendBody = BODY_METHODS.has(operation.method);
 

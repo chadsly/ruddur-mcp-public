@@ -103,6 +103,7 @@ export const OPERATIONS: Operation[] = [
 
   op("ruddur_list_relationships", "List the authenticated user's delegated relationships of every type, including participant details, status, and lightweight pointers to assigned Headings with progress and completion status. Use assignment IDs from this response to retrieve an assigned copy's inputs and results.", "GET", "/api/delegations", one("relationships.read")),
   op("ruddur_list_coaching_clients", "List active Coach → Client relationships where the authenticated user is the coach, including each client's assigned-Heading pointers, progress, and completion status. Use an assignment ID to retrieve that assigned copy's inputs and results.", "GET", "/api/delegations/coaching-clients", one("relationships.read")),
+  op("ruddur_assign_heading", "Assign an existing creator-owned Heading to an active coaching client. First use ruddur_list_coaching_clients to resolve relationshipId and ruddur_search_headings or ruddur_list_headings to resolve headingId. Pass those two IDs; the client is derived from the relationship. Repeated calls for the same pair return the existing assignment and copy.", "POST", "/api/delegations/coaching-clients/:relationshipId/assignments", one("relationships.assign"), { mutation: true }),
   op("ruddur_get_assigned_heading_results", "Retrieve the assignee's specific Heading copy, Waypoints, saved inputs, assessment results, and current statuses for an assignment created by the authenticated user. Access is assignment-scoped and never exposes the assignee's unrelated Headings.", "GET", "/api/delegations/assignments/:id/inputs", one("relationships.read")),
 
   op("ruddur_list_my_marketplace_listings", "List marketplace listings owned by the creator.", "GET", "/api/marketplace/listings/mine", any("listings.read", "listings.manage")),
@@ -170,7 +171,12 @@ export const buildPath = (operation: Operation, args: ToolArguments) => {
 
 export const toolForOperation = (operation: Operation) => {
   const pathNames = pathParameterNames(operation.path);
-  const properties: Record<string, unknown> = {
+  const assignmentTool = operation.name === "ruddur_assign_heading";
+  const properties: Record<string, unknown> = assignmentTool ? {
+    relationshipId: { type: "string", description: "Active Coach → Client relationship ID from ruddur_list_coaching_clients." },
+    headingId: { type: "string", description: "Creator-owned Heading ID from ruddur_search_headings or ruddur_list_headings." },
+    message: { type: "string", description: "Optional note to the client, at most 2000 characters." },
+  } : {
     query: {
       type: "object",
       description: "Optional query parameters.",
@@ -181,7 +187,7 @@ export const toolForOperation = (operation: Operation) => {
       description: BODY_SCHEMA_DESCRIPTION,
     },
   };
-  if (pathNames.length) {
+  if (pathNames.length && !assignmentTool) {
     properties.pathParams = {
       type: "object",
       description: `Path parameters: ${pathNames.join(", ")}.`,
@@ -212,7 +218,8 @@ export const toolForOperation = (operation: Operation) => {
       type: "object",
       properties,
       required: [
-        ...(pathNames.length ? ["pathParams"] : []),
+        ...(assignmentTool ? ["relationshipId", "headingId"] : []),
+        ...(pathNames.length && !assignmentTool ? ["pathParams"] : []),
         ...(operation.confirmationRequired ? ["confirm"] : []),
         ...(operation.idempotencyKeyRequired ? ["idempotencyKey"] : []),
       ],

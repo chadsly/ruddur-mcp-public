@@ -3,6 +3,14 @@ import test from "node:test";
 import { normalizeToolArguments } from "../src/arguments.js";
 import { operationByName } from "../src/catalog.js";
 
+test("assignment arguments resolve to the existing relationship assignment API", () => {
+  const operation = operationByName.get("ruddur_assign_heading")!;
+  assert.deepEqual(normalizeToolArguments(operation, {
+    relationshipId: " relationship-id ", headingId: " heading-id ", message: "Focus on meals",
+  }), { pathParams: { relationshipId: "relationship-id" }, body: { headingId: "heading-id", message: "Focus on meals" } });
+  assert.throws(() => normalizeToolArguments(operation, { relationshipId: "relationship-id" }), /headingId/);
+});
+
 test("normalizes top-level write fields into the request body", () => {
   const operation = operationByName.get("ruddur_create_heading");
   assert.ok(operation);
