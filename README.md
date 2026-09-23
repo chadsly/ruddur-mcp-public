@@ -10,6 +10,8 @@ The service operator must deploy the included Docker image and publish `/mcp` ov
 
 Coaches can grant `relationships.assign` separately from `relationships.read`. With that write grant, `ruddur_assign_heading` takes the `relationshipId` from `ruddur_list_coaching_clients` and a creator-owned `headingId` from Heading search/list tools. The API derives the client from the active coaching relationship, copies the Heading and Waypoints through the same application workflow as the web UI, and returns the existing assignment on retry. Grant `relationships.read` as well to verify the assignment through the coaching roster and assigned-results tools. Existing read-only tokens cannot assign Headings; reconnect and approve the new grant to make the tool available.
 
+`ruddur_remove_heading_assignment` uses that same assignment-write grant for a coach or other assigner to remove one of their assignments. It requires an active relationship, both IDs from the relationship roster, and `confirm=true`. Removal is idempotent and ends assignment-scoped result access. An untouched client copy is removed; a started copy and its saved work remain with the client.
+
 ## Protocol compatibility
 
 The HTTPS endpoint automatically supports both MCP eras:

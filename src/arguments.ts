@@ -328,6 +328,14 @@ const normalizeOperationBody = (operation: Operation, body: unknown): unknown =>
 };
 
 export const normalizeToolArguments = (operation: Operation, rawArguments: Record<string, unknown>): ToolArguments => {
+  if (operation.name === "ruddur_remove_heading_assignment") {
+    const relationshipId = rawArguments.relationshipId;
+    const assignmentId = rawArguments.assignmentId;
+    if (typeof relationshipId !== "string" || !relationshipId.trim() || typeof assignmentId !== "string" || !assignmentId.trim()) {
+      throw new Error("relationshipId and assignmentId are required.");
+    }
+    return { pathParams: { relationshipId: relationshipId.trim(), assignmentId: assignmentId.trim() }, confirm: rawArguments.confirm === true };
+  }
   if (operation.name === "ruddur_assign_heading") {
     const relationshipId = rawArguments.relationshipId;
     const headingId = rawArguments.headingId;

@@ -78,13 +78,24 @@ test("coaching assignment is a separate write grant without changing read-only a
   const readOnly = visibleOperations(new Set(["relationships.read"]), true);
   assert.ok(!readOnly.some(operation => operation.name === "ruddur_assign_heading"));
   const writeOnly = visibleOperations(new Set(["relationships.assign"]), true);
-  assert.deepEqual(writeOnly.map(operation => operation.name), ["ruddur_assign_heading"]);
+  assert.deepEqual(writeOnly.map(operation => operation.name), ["ruddur_assign_heading", "ruddur_remove_heading_assignment"]);
   assert.ok(!visibleOperations(new Set(["relationships.assign"]), false).some(operation => operation.name === "ruddur_assign_heading"));
   const operation = operationByName.get("ruddur_assign_heading")!;
   assert.equal(buildPath(operation, { pathParams: { relationshipId: "relationship-id" } }), "/api/delegations/coaching-clients/relationship-id/assignments");
   assert.deepEqual(toolForOperation(operation).inputSchema.required, ["relationshipId", "headingId"]);
   assert.equal(toolForOperation(operation).annotations.readOnlyHint, false);
   assert.match(operation.description, /ruddur_list_coaching_clients/);
+});
+
+test("removal requires assignment-write scope and explicit confirmation", () => {
+  const operation = operationByName.get("ruddur_remove_heading_assignment")!;
+  assert.equal(operation.scope.scopes[0], "relationships.assign");
+  assert.equal(operation.confirmationRequired, true);
+  assert.equal(operation.destructive, true);
+  assert.equal(buildPath(operation, { pathParams: { relationshipId: "relationship", assignmentId: "assignment" } }),
+    "/api/delegations/relationships/relationship/assignments/assignment");
+  assert.deepEqual(toolForOperation(operation).inputSchema.required, ["relationshipId", "assignmentId", "confirm"]);
+  assert.ok(!visibleOperations(new Set(["relationships.read"]), true).some(item => item.name === operation.name));
 });
 
 test("path parameters are encoded and required", () => {

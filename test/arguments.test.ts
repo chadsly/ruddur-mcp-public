@@ -11,6 +11,13 @@ test("assignment arguments resolve to the existing relationship assignment API",
   assert.throws(() => normalizeToolArguments(operation, { relationshipId: "relationship-id" }), /headingId/);
 });
 
+test("removal arguments resolve to a relationship-scoped delete", () => {
+  const operation = operationByName.get("ruddur_remove_heading_assignment")!;
+  assert.deepEqual(normalizeToolArguments(operation, { relationshipId: " rel ", assignmentId: " assignment ", confirm: true }),
+    { pathParams: { relationshipId: "rel", assignmentId: "assignment" }, confirm: true });
+  assert.throws(() => normalizeToolArguments(operation, { assignmentId: "assignment", confirm: true }), /relationshipId/);
+});
+
 test("normalizes top-level write fields into the request body", () => {
   const operation = operationByName.get("ruddur_create_heading");
   assert.ok(operation);
